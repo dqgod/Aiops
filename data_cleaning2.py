@@ -16,7 +16,7 @@ traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
 deploys = {'csf_001': {"docker": "docker"}}
 
 
-def run():
+def main():
     # saveJson(build_trace())
     f2 = open(path+"one_trace.json", "w")
     with open(path+"test_data.json", "r") as f:
@@ -28,10 +28,10 @@ def run():
         # print(trace)
         # print(trace.getGraph())
     f2.close
-# todo 读取文件，并以列表的形式返回
 
 
 def readCSV(p):
+    # todo 读取文件，并以列表的形式返回
     res = []
     with open(p, 'r') as f:
         reader = csv.reader(f)
@@ -39,7 +39,8 @@ def readCSV(p):
     return res
 
 
-file_now = {}  # todo 保存当前已经加载的 文件（后面可能会用到）
+# todo 保存当前已经加载的 文件（后面可能会用到）
+file_now = {}
 
 
 def getKPIs(timeStamp, cmd_id, dsName=None):
@@ -73,10 +74,9 @@ def getKPIs(timeStamp, cmd_id, dsName=None):
                 timeJson[row[1]] = time
     return valueJson
 
-# ? 二分查找
-
 
 def binarySearch(res, timestamp, low, high):
+    # todo 二分查找
     while low < high:
         middle = (low+high)//2
         cur_time = int(res[middle][3])
@@ -87,10 +87,10 @@ def binarySearch(res, timestamp, low, high):
         else:
             low = middle+1
     return low
-# 将所有文件合并成 trace
 
 
 def build_trace():
+    # todo 将所有文件合并成 trace
     res = {}
     print("开始trace数据合并！")
     merge_time = []
@@ -124,10 +124,10 @@ def build_trace():
         break
     print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
     return res
-# 将一行数据 row 放到字典中
 
 
 def generate_span(row):
+    # todo 将一行数据 row 放到字典中
     span = {}
     span["parentId"] = row[6] if row[6] != "None" else "root"
     span["target"] = row[8].replace('"', "").rstrip()
@@ -142,10 +142,10 @@ def generate_span(row):
     # span["KPIs"] = getKPIs(
     #     int(span["timestamp"]), span['cmdb_id'], span["db"])
     return span
-# res 是一个字典
 
 
-def saveJson(res: dict):
+def saveJson(res):
+    # todo res 是一个字典
     p = path+"test_data.json"
 
     def processJson(js):
@@ -166,8 +166,8 @@ def saveJson(res: dict):
     print("保存完毕!花费 "+str(time.time()-start_time)+"S")
 
 
-# todo 传入一条 trace， 并得到他的KPIs
 def generate_KPIs_for_trace(trace):
+    # todo 传入一条 trace， 并得到他的KPIs
     graph = generateGraph(trace)
     for k, v in trace.items():
         if k != "startTime":
@@ -182,6 +182,8 @@ def generate_KPIs_for_trace(trace):
 
 
 def generateGraph(trace):
+    # todo  传入一条trace 将他的所有审判生成一个数据字典
+    # todo 数据字典的key为span_id, 其值是他字节点的id，是一个列表
     graph = {}
     for key, val in trace.items():
         if key != "startTime":
@@ -243,4 +245,4 @@ class Span:
 
 
 if __name__ == "__main__":
-    run()
+    main()
