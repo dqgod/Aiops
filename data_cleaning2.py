@@ -13,7 +13,7 @@ fileNames = {'os': 'os_linux.csv', 'container': 'dcos_container.csv',
 datestamps = [""]
 traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
               "trace_remote_process", "trace_local", "trace_jdbc"]
-deploys = {'csf_001': {"docker": "docker"}}
+# deploys = {'csf_001': {"docker": "docker"}}
 
 
 def main():
@@ -112,9 +112,9 @@ def build_trace():
                 # 将span放到相应的trace中
                 traceId, span_id = row[4], row[5]
                 if res.get(traceId) == None:
-                    res[traceId] = {"startTime": span["timestamp"]}
-                trace = res[traceId]
-                trace[span_id] = span
+                    res[traceId] = {"startTime": span["timestamp"],"spans":{}}
+                spans = res[traceId]["spans"]
+                spans[span_id] = span
 
             time_spend = time.time()-time1
             merge_time.append(time_spend)
@@ -127,6 +127,9 @@ def build_trace():
 
 
 def generate_span(row):
+    '''
+    0 callType,1 startTime,2 elapsedTime,3 success,4 traceId,5 id,6 pid,7 cmdb_id,8 serviceName
+    '''
     # todo 将一行数据 row 放到字典中
     span = {}
     span["parentId"] = row[6] if row[6] != "None" else "root"
@@ -145,7 +148,9 @@ def generate_span(row):
 
 
 def saveJson(res):
-    # todo res 是一个字典
+    '''
+    res中每一条数据都是 traceId: {starttime:111111, spans:{}}
+    '''
     p = path+"test_data.json"
 
     def processJson(js):
@@ -154,42 +159,48 @@ def saveJson(res):
     print("保存路径: "+p)
     start_time = time.time()
     with open(p, 'w') as f:
-        # res中每一条数据都是 traceId: trace
-        items = list(res.items())
-        length = len(items)
+        # res中每一条数据都是 traceId: {starttime:111111, spans:{}}
+        items = list(res.items()) 
+        length = len(items) #数据量
         for i in tqdm(range(length), desc="保存数据中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
             # ? 保存数据时同时 得到 KPIs
-            traceId, trace = items.pop(0)
+            traceId, trace = items.pop(0) # traceId, {starttime:111111, spans:{}}
             generate_KPIs_for_trace(trace)
-
             f.write('{"'+traceId+'": '+processJson(trace)+"}\n")
+
     print("保存完毕!花费 "+str(time.time()-start_time)+"S")
 
 
 def generate_KPIs_for_trace(trace):
-    # todo 传入一条 trace， 并得到他的KPIs
-    graph = generateGraph(trace)
-    for k, v in trace.items():
-        if k != "startTime":
-            child1 = graph.get(k)  # child保存的时 k 的子节点的 id，是一个列表
-            '''
-            #todo 如果他有字节点，通过子节点找到自己属于哪个docker，如果没有
-            #todo 则说明他是叶子节点，也就是db层，此时传入db name
-            '''
-            cmd_id = trace[child1[0]]['cmdb_id'] if child1 != None else (
-                v['target'] if "db" in v['target'] else None)
-            v['KPIs'] = getKPIs(int(v["timestamp"]), cmd_id)
+    """
+    传入一条 trace， 并得到他的KPIs
+    trace格式 {starttime:111111, spans:{}}
+    """
+    spans = trace['spans']
+    graph = generateGraph(spans)
+
+    for k, v in spans.items():
+        child1 = graph.get(k)  # child保存的时 k 的子节点的 id，是一个列表
+        '''
+        #todo 如果他有字节点，通过子节点找到自己属于哪个docker，如果没有
+        #todo 则说明他是叶子节点，也就是db层，此时传入db name
+        '''
+        cmd_id = trace[child1[0]]['cmdb_id'] if child1 != None else (
+            v['target'] if "db" in v['target'] else None)
+        v['KPIs'] = getKPIs(int(v["timestamp"]), cmd_id)
 
 
-def generateGraph(trace):
-    # todo  传入一条trace 将他的所有审判生成一个数据字典
-    # todo 数据字典的key为span_id, 其值是他字节点的id，是一个列表
+def generateGraph(trace_spans):
+    """
+    传入一条trace中的所有span 将他的所有span生成一个数据字典
+    数据字典的key为span_id, 其值是他字节点的id，是一个列表
+    trace_spans:{ span_id:{},span_id2:{}}
+    """
     graph = {}
-    for key, val in trace.items():
-        if key != "startTime":
-            if graph.get(val["parentId"]) == None:
-                graph[val["parentId"]] = []
-            graph[val["parentId"]].append(key)
+    for key, val in trace_spans.items():
+        if graph.get(val["parentId"]) == None:
+            graph[val["parentId"]] = []
+        graph[val["parentId"]].append(key)
     return graph
 
 
