@@ -19,18 +19,20 @@ traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
 
 bias = 10*1000
 def main():
+    time0 = time.time()
     save_path = os.path.join(path,"test_data.json")
-    # saveJson(build_trace(),save_path))
-    f2 = open(os.path.join(path,"one_trace.json"), "w")
-    with open(save_path, "r") as f:
-        line = f.readline()
-        # print(line)
-        js = json.loads(line)
-        f2.write(json.dumps(js, indent=4))
-        # trace = Trace(js)
-        # print(trace)
-        # print(trace.getGraph())
-    f2.close
+    saveJson(build_trace(),save_path)
+    # f2 = open(os.path.join(path,"one_trace.json"), "w")
+    # with open(save_path, "r") as f:
+    #     line = f.readline()
+    #     # print(line)
+    #     js = json.loads(line)
+    #     f2.write(json.dumps(js, indent=4))
+    #     # trace = Trace(js)
+    #     # print(trace)
+    #     # print(trace.getGraph())
+    # f2.close
+    print("程序运行完毕！花费: "+str(time.time()-time0)+" 秒")
 def build_trace():
     # todo 将所有文件合并成 trace
     res = {}
