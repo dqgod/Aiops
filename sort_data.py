@@ -8,6 +8,7 @@ path = "F:\\aiops\\data_all\\2020_04_11\\平台指标\\"
 
 
 def readCSV(path):
+    
     res = []
     with open(path, 'r') as f:
         reader = csv.reader(f)
@@ -18,7 +19,7 @@ def readCSV(path):
 def order(path):
     files = os.listdir(path)
     for file in files:
-        temp = readCSV(path + file)
+        temp = readCSV(os.path.join(path , file))
         row_first = temp[0]
         temp = sorted(temp[1:], key=lambda x: x[3])
         new_name = file.split(".")[0]+"_sorted"
@@ -36,7 +37,7 @@ def divide_file(path):
         if "csv" not in file_name:
             continue
         # 读取一个文件数据
-        data = readCSV(path+file_name)[1:]
+        data = readCSV(os.path.join(path,file_name))[1:]
         # 获取该文件的前缀如 db、docker、os、redis
         new_dir = file_name.split('_')[0] if 'dcos' not in file_name else re.split('[_.]',file_name)[1]
         new_dir = 'redis' if 'redis' in file_name else new_dir

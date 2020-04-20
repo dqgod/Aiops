@@ -21,8 +21,8 @@ traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
 bias = 10*1000
 def main():
     time0 = time.time()
-    if len(os.listdir(path3))<=5:
-        divide_file(path3)
+    if len(os.listdir(path2))<=5:
+        divide_file(path2)
     save_path = os.path.join(path,"test_data.json")
     saveJson(build_trace(),save_path)
     # f2 = open(os.path.join(path,"one_trace.json"), "w")
