@@ -1,12 +1,14 @@
+from readExcel import fill_all_indicators
 import csv
 import os
 import sys
 import json
 from tqdm import tqdm
 import time
-path = "F:\\aiops\\data_all\\2020_04_11\\调用链指标\\"
-path2 = "F:\\aiops\\data_all\\2020_04_11\\平台指标\\"
-maxPeriod = 600000
+p0 = "F:\\aiops\\data_all\\2020_04_11\\"
+path = p0+"调用链指标"
+path2 = p0+"平台指标"
+path3 = "F:\\aiops\\data_release_v2.0\\数据说明"
 fileNames = {'os': 'os_linux.csv', 'container': 'dcos_container.csv',
              'db': 'db_oracle_11g.csv', 'docker': 'dcos_docker.csv'}
 # datestamps=["datestamp=2020-02-14","datestamp=2020-02-15","datestamp=2020-02-16","datestamp=2020-02-17","datestamp=2020-02-18","datestamp=2020-02-19","datestamp=2020-02-20"]
@@ -15,22 +17,61 @@ traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
               "trace_remote_process", "trace_local", "trace_jdbc"]
 # deploys = {'csf_001': {"docker": "docker"}}
 
-
+bias = 10*1000
 def main():
-    # saveJson(build_trace())
-    f2 = open(path+"one_trace.json", "w")
-    with open(path+"test_data.json", "r") as f:
+    save_path = os.path.join(path,"test_data.json")
+    # saveJson(build_trace(),save_path))
+    f2 = open(os.path.join(path,"one_trace.json"), "w")
+    with open(save_path, "r") as f:
         line = f.readline()
-        print(line)
+        # print(line)
         js = json.loads(line)
         f2.write(json.dumps(js, indent=4))
         # trace = Trace(js)
         # print(trace)
         # print(trace.getGraph())
     f2.close
+def build_trace():
+    # todo 将所有文件合并成 trace
+    res = {}
+    print("开始trace数据合并！")
+    merge_time = []
+    for day in datestamps:
+        for traceName in traceNames:
+            # csvName = "trace_csf"
+            p = os.path.join(path, traceName)+".csv"
+            print("正在读取文件 "+traceName)
+            temp = readCSV(p)
+            print("读取"+traceName+"完毕，开始生成trace")
+            time1 = time.time()
+            for i in tqdm(range(len(temp)-1), desc=traceName, ncols=100, ascii=' =', bar_format='{l_bar}{bar}|'):
+                # 0 callType,1 startTime,2 elapsedTime,3 success,4 traceId,5 id,6 pid,7 cmdb_id,8 serviceName
+                row = temp[i+1]
+                if len(row) <= 3:
+                    continue
+                # 通过row 构造span
+                span = generate_span(row)
+                # 将span放到相应的trace中
+                traceId, span_id = row[4], row[5]
+                if res.get(traceId) == None:
+                    res[traceId] = {
+                        "startTime": span["timestamp"], "spans": {}}
+                spans = res[traceId]["spans"]
+                spans[span_id] = span
 
+            time_spend = time.time()-time1
+            merge_time.append(time_spend)
+            print("文件"+traceName+"_"+day+".csv " +
+                  "合并完毕,共花费 "+str(time_spend)+"S")
+            # break
+        # break
+    print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
+    return res
 
 def readCSV(p):
+    #todo 文件不存在直接返回
+    if not os.path.exists(p):
+        return []
     # todo 读取文件，并以列表的形式返回
     res = []
     with open(p, 'r') as f:
@@ -39,30 +80,65 @@ def readCSV(p):
     return res
 
 
+# todo { cmd_id:{ timestamp:123456,values:{}}}
+kpis = {}  # 记录下指标
+# todo {db:{  indicator1:time1,indcator2:time2}}
+indicators = fill_all_indicators(path3)
+
+def getKPIs(timeStamp, cmd_id, bias=0):
+    if not cmd_id:
+        return {}
+    key = cmd_id.split('_')[0]
+    # 时间偏差不大，直接返回已经记录的
+    if kpis.get(cmd_id) != None and abs(kpis[cmd_id]["timestamp"] - timeStamp) <= bias:
+        return kpis[cmd_id]["values"]
+    valueJson = {}
+    # 遍历所有指标名，闭关将相应的指标获取
+    for indicator_name, sample_period in indicators[key].items():
+        # 指标名，取样周期
+        valueJson.update(get_kpis_for_an_indicator(
+            timeStamp, cmd_id, key, indicator_name, sample_period*1000))
+
+    kpis[cmd_id] = {"timestamp": timeStamp, "values": valueJson}
+    return valueJson
+
+
 # todo 保存当前已经加载的 文件（后面可能会用到）
 file_now = {}
 
 
-def getKPIs(timeStamp, cmd_id, dsName=None):
-    if not cmd_id and not dsName:
-        return {}
-    key = cmd_id.split('_')[0] if not dsName else dsName.split('_')[0]
-    fileName = fileNames.get(key)
+def get_kpis_for_an_indicator(timeStamp, cmd_id, key, indicator_name, sample_period):
+    '''
+    timeStamp:时间戳
+    cmd_id:类似docker_007
+    key: docker,cmd_id 前面部分，用作路径
+    indicator_name:指标名
+    sample_period:取样周期
+    '''
+    # todo 获取该指标文件存储路径
+    file_path = os.path.join(path2, key, indicator_name + ".csv")
+    # path2+"\\" + \
+    #     key + "\\" + indicator_name + ".csv"
     res = ""
-    if file_now.get(fileName) == None:
-        csv_file = readCSV(path2+fileName)
+    # todo 如果该文件没有读取过
+    if file_now.get(file_path) == None:
+        csv_file = readCSV(file_path)
+        if not csv_file:
+            return {}
         res = sorted(csv_file[1:], key=lambda x: x[3])
-        fileNames[fileName] = res
-    else:
-        res = fileNames[fileName]
+        file_now[file_path] = res
+    else:  # 否则直接从dict中读
+        res = file_now[file_path]
     valueJson = {}
     timeJson = {}
-    low_index, high_index = binarySearch(res, timeStamp-maxPeriod, 0, len(res)-1), \
-        binarySearch(res, timeStamp+maxPeriod, 0, len(res)-1)
+    low_index, high_index = binarySearch(res, timeStamp-sample_period, 0, len(res)-1), \
+        binarySearch(res, timeStamp+sample_period, 0, len(res)-1)
+    # print(cmd_id,indicator_name,low_index,high_index)
     for i in range(low_index, high_index):
         row = res[i]
         time = abs(int(row[3])-timeStamp)
-        if row[5] == cmd_id or row[5] == dsName:
+
+        if row[5] == cmd_id:
             if valueJson.get(row[1]) != None:  # 如果已经有了
                 if time < timeJson[row[1]]:
                     valueJson[row[1]] = row[4]
@@ -89,41 +165,7 @@ def binarySearch(res, timestamp, low, high):
     return low
 
 
-def build_trace():
-    # todo 将所有文件合并成 trace
-    res = {}
-    print("开始trace数据合并！")
-    merge_time = []
-    for day in datestamps:
-        for traceName in traceNames:
-            # csvName = "trace_csf"
-            p = os.path.join(path, traceName)+".csv"
-            print("正在读取文件 "+traceName)
-            temp = readCSV(p)
-            print("读取"+traceName+"完毕，开始生成trace")
-            time1 = time.time()
-            for i in tqdm(range(len(temp)-1), desc=traceName, ncols=100, ascii=' =', bar_format='{l_bar}{bar}|'):
-                # 0 callType,1 startTime,2 elapsedTime,3 success,4 traceId,5 id,6 pid,7 cmdb_id,8 serviceName
-                row = temp[i+1]
-                if len(row) <= 3:
-                    continue
-                # 通过row 构造span
-                span = generate_span(row)
-                # 将span放到相应的trace中
-                traceId, span_id = row[4], row[5]
-                if res.get(traceId) == None:
-                    res[traceId] = {"startTime": span["timestamp"],"spans":{}}
-                spans = res[traceId]["spans"]
-                spans[span_id] = span
 
-            time_spend = time.time()-time1
-            merge_time.append(time_spend)
-            print("文件"+traceName+"_"+day+".csv " +
-                  "合并完毕,共花费 "+str(time_spend)+"S")
-            # break
-        break
-    print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
-    return res
 
 
 def generate_span(row):
@@ -147,24 +189,23 @@ def generate_span(row):
     return span
 
 
-def saveJson(res):
+def saveJson(res,save_path):
     '''
     res中每一条数据都是 traceId: {starttime:111111, spans:{}}
     '''
-    p = path+"test_data.json"
-
     def processJson(js):
         return json.dumps(js)
         # return str(js)
-    print("保存路径: "+p)
+    print("保存路径: "+save_path)
     start_time = time.time()
-    with open(p, 'w') as f:
+    with open(save_path, 'w') as f:
         # res中每一条数据都是 traceId: {starttime:111111, spans:{}}
-        items = list(res.items()) 
-        length = len(items) #数据量
+        items = list(res.items())
+        length = len(items)  # 数据量
         for i in tqdm(range(length), desc="保存数据中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
             # ? 保存数据时同时 得到 KPIs
-            traceId, trace = items.pop(0) # traceId, {starttime:111111, spans:{}}
+            # traceId, {starttime:111111, spans:{}}
+            traceId, trace = items.pop(0)
             generate_KPIs_for_trace(trace)
             f.write('{"'+traceId+'": '+processJson(trace)+"}\n")
 
@@ -177,17 +218,19 @@ def generate_KPIs_for_trace(trace):
     trace格式 {starttime:111111, spans:{}}
     """
     spans = trace['spans']
-    graph = generateGraph(spans)
+    # graph = generateGraph(spans)
 
-    for k, v in spans.items():
-        child1 = graph.get(k)  # child保存的时 k 的子节点的 id，是一个列表
+    for span_id, span in spans.items():
+        # child1 = graph.get(k)  # child保存的时 k 的子节点的 id，是一个列表
         '''
         #todo 如果他有字节点，通过子节点找到自己属于哪个docker，如果没有
         #todo 则说明他是叶子节点，也就是db层，此时传入db name
         '''
-        cmd_id = trace[child1[0]]['cmdb_id'] if child1 != None else (
-            v['target'] if "db" in v['target'] else None)
-        v['KPIs'] = getKPIs(int(v["timestamp"]), cmd_id)
+        # cmd_id = trace[child1[0]]['cmdb_id'] if child1 != None else (
+        #     v['target'] if "db" in v['target'] else None)
+
+        cmd_id = span['cmdb_id'] if not span['db'] else span['db']
+        span['KPIs'] = getKPIs(int(span["timestamp"]), span['cmdb_id'], bias)
 
 
 def generateGraph(trace_spans):
