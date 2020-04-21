@@ -6,10 +6,13 @@ import sys
 import json
 from tqdm import tqdm
 import time
-p0 = "F:\\aiops\\data_all\\2020_04_11\\"
+prex_path_all = "/home/bdilab/aiops"
+if os.name=='nt':# windows , linux 是posix
+    prex_path_all = "F:\\aiops"
+p0 = prex_path_all+os.sep+'data_all'+os.sep+'2020_04_11'+os.sep
 path = p0+"调用链指标"
 path2 = p0+"平台指标"
-path3 = "F:\\aiops\\data_release_v2.0\\数据说明"
+path3 = prex_path_all+os.sep+'data_release_v2.0'+os.sep+'数据说明'+os.sep
 fileNames = {'os': 'os_linux.csv', 'container': 'dcos_container.csv',
              'db': 'db_oracle_11g.csv', 'docker': 'dcos_docker.csv'}
 # datestamps=["datestamp=2020-02-14","datestamp=2020-02-15","datestamp=2020-02-16","datestamp=2020-02-17","datestamp=2020-02-18","datestamp=2020-02-19","datestamp=2020-02-20"]
@@ -18,13 +21,13 @@ traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
               "trace_remote_process", "trace_local", "trace_jdbc"]
 # deploys = {'csf_001': {"docker": "docker"}}
 
-bias = 10*1000
+bias = 1*1000
 def main():
     time0 = time.time()
     if len(os.listdir(path2))<=5:
         divide_file(path2)
     save_path = os.path.join(path,"test_data.json")
-    saveJson(build_trace(),save_path)
+    # saveJson(build_trace(),save_path)
     # f2 = open(os.path.join(path,"one_trace.json"), "w")
     # with open(save_path, "r") as f:
     #     line = f.readline()

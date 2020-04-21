@@ -8,7 +8,8 @@ def swichTime(t:int,plus=0) -> str:
     return datetime.datetime.fromtimestamp(t)
 
 def run():
-    print(np.log(1000000))
+    operate_file()
+    # print(np.log(1000000))
     # print(time.time())
     # print(swichTime(time.time()))
     # print(swichTime(1587113900685,))
@@ -23,19 +24,20 @@ def run():
  
 def operate_file():
     # print (os.sep)
-    # print (os.name)
+    if os.name=='nt':
+        print("是windows")
     # print (os.getenv('path'))
-    path = os.getcwd()
-    files= os.listdir(path)
-    print (files)
-    #拼接了路径
-    fullpath=os.path.join(path,files[0])
-    print (fullpath)
-    #判断一个路径是否是一个文件，是否目录
-    if os.path.isfile(fullpath):
-        print ('我是一个文件')
-    elif os.path.isdir(fullpath):
-        print ('我是一个目录')
+    # path = os.getcwd()
+    # files= os.listdir(path)
+    # print (files)
+    # #拼接了路径
+    # fullpath=os.path.join(path,files[0])
+    # print (fullpath)
+    # #判断一个路径是否是一个文件，是否目录
+    # if os.path.isfile(fullpath):
+    #     print ('我是一个文件')
+    # elif os.path.isdir(fullpath):
+    #     print ('我是一个目录')
 
 if __name__=="__main__":
     run()
