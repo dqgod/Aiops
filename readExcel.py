@@ -20,7 +20,8 @@ def fill_indicator(table,indicator):
     for i in range(1,table.nrows):
         value = table.row_values(i)
         # indicator[(value[bomc_id_index],value[name_index].split(r'[')[0])] = int(value[collect_index])
-        indicator[value[name_index].split(r'[')[0]] = int(value[collect_index])
+        # indicator[value[name_index].split(r'[')[0]] = int(value[collect_index])
+        indicator[value[bomc_id_index]] = (int(value[collect_index]),value[name_index].split(r'[')[0])
 
 def fill_all_indicators(path_prex):
     indicators = {}  #{db:{ id,indicator1:{}}}

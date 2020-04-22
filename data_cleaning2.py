@@ -27,17 +27,17 @@ def main():
     if len(os.listdir(path2))<=5:
         divide_file(path2)
     save_path = os.path.join(path,"test_data.json")
-    # saveJson(build_trace(),save_path)
-    # f2 = open(os.path.join(path,"one_trace.json"), "w")
-    # with open(save_path, "r") as f:
-    #     line = f.readline()
-    #     # print(line)
-    #     js = json.loads(line)
-    #     f2.write(json.dumps(js, indent=4))
-    #     # trace = Trace(js)
-    #     # print(trace)
-    #     # print(trace.getGraph())
-    # f2.close
+    saveJson(build_trace(),save_path)
+    f2 = open(os.path.join(path,"one_trace.json"), "w")
+    with open(save_path, "r") as f:
+        line = f.readline()
+        # print(line)
+        js = json.loads(line)
+        f2.write(json.dumps(js, indent=4))
+        # trace = Trace(js)
+        # print(trace)
+        # print(trace.getGraph())
+    f2.close
     print("程序运行完毕！花费: "+str(time.time()-time0)+" 秒")
 def build_trace():
     # todo 将所有文件合并成 trace
@@ -66,12 +66,12 @@ def build_trace():
                         "startTime": span["timestamp"], "spans": {}}
                 spans = res[traceId]["spans"]
                 spans[span_id] = span
-
+                break
             time_spend = time.time()-time1
             merge_time.append(time_spend)
             print("文件"+traceName+"_"+day+".csv " +
                   "合并完毕,共花费 "+str(time_spend)+"S")
-            # break
+            break
         # break
     print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
     return res
@@ -102,10 +102,12 @@ def getKPIs(timeStamp, cmd_id, bias=0):
         return kpis[cmd_id]["values"]
     valueJson = {}
     # 遍历所有指标名，闭关将相应的指标获取
-    for indicator_name, sample_period in indicators[key].items():
+    for bomc_id, (sample_period,indicator_name) in indicators[key].items():
+        # csv 路径
+        file_path = os.path.join(path2, key, indicator_name + ".csv")
         # 指标名，取样周期
         valueJson.update(get_kpis_for_an_indicator(
-            timeStamp, cmd_id, key, indicator_name, sample_period*1000))
+            timeStamp, cmd_id, bomc_id , sample_period*1000,file_path))
 
     kpis[cmd_id] = {"timestamp": timeStamp, "values": valueJson}
     return valueJson
@@ -115,7 +117,7 @@ def getKPIs(timeStamp, cmd_id, bias=0):
 file_now = {}
 
 
-def get_kpis_for_an_indicator(timeStamp, cmd_id, key, indicator_name, sample_period):
+def get_kpis_for_an_indicator(timeStamp, cmd_id, bomc_id, sample_period,file_path):
     '''
     timeStamp:时间戳
     cmd_id:类似docker_007
@@ -124,9 +126,6 @@ def get_kpis_for_an_indicator(timeStamp, cmd_id, key, indicator_name, sample_per
     sample_period:取样周期
     '''
     # todo 获取该指标文件存储路径
-    file_path = os.path.join(path2, key, indicator_name + ".csv")
-    # path2+"\\" + \
-    #     key + "\\" + indicator_name + ".csv"
     res = ""
     # todo 如果该文件没有读取过
     if file_now.get(file_path) == None:
@@ -142,20 +141,22 @@ def get_kpis_for_an_indicator(timeStamp, cmd_id, key, indicator_name, sample_per
     low_index, high_index = binarySearch(res, timeStamp-sample_period, 0, len(res)-1), \
         binarySearch(res, timeStamp+sample_period, 0, len(res)-1)
     # print(cmd_id,indicator_name,low_index,high_index)
+    # itemid,name,bomc_id,timestamp,value,cmdb_id
     for i in range(low_index, high_index):
         row = res[i]
         time = abs(int(row[3])-timeStamp)
-
-        if row[5] == cmd_id:
+        if row[5] == cmd_id and bomc_id==row[2]:
+            # 记录的KEY
+            new_key = '(%s,%s,%s)' % (row[0],row[1],row[2])
             if valueJson.get(row[1]) != None:  # 如果已经有了
                 if time < timeJson[row[1]]:
-                    valueJson[row[1]] = row[4]
-                    timeJson[row[1]] = time
+                    valueJson[new_key] = row[4]
+                    timeJson[new_key] = time
                 else:  # res是按照时间递增的,因此开始时一定是逐渐减少，之后一定是开始增大
                     break
             else:
-                valueJson[row[1]] = row[4]
-                timeJson[row[1]] = time
+                valueJson[new_key] = row[4]
+                timeJson[new_key] = time
     return valueJson
 
 
