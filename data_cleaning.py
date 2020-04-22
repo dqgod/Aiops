@@ -66,12 +66,12 @@ def build_trace():
                         "startTime": span["timestamp"], "spans": {}}
                 spans = res[traceId]["spans"]
                 spans[span_id] = span
-                break
+                # break
             time_spend = time.time()-time1
             merge_time.append(time_spend)
             print("文件"+traceName+"_"+day+".csv " +
                   "合并完毕,共花费 "+str(time_spend)+"S")
-            break
+            # break
         # break
     print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
     return res
@@ -148,8 +148,8 @@ def get_kpis_for_an_indicator(timeStamp, cmd_id, bomc_id, sample_period,file_pat
         if row[5] == cmd_id and bomc_id==row[2]:
             # 记录的KEY
             new_key = '(%s,%s,%s)' % (row[0],row[1],row[2])
-            if valueJson.get(row[1]) != None:  # 如果已经有了
-                if time < timeJson[row[1]]:
+            if valueJson.get(new_key) != None:  # 如果已经有了
+                if time < timeJson[new_key]:
                     valueJson[new_key] = row[4]
                     timeJson[new_key] = time
                 else:  # res是按照时间递增的,因此开始时一定是逐渐减少，之后一定是开始增大
