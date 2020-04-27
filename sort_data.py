@@ -31,8 +31,9 @@ def order(path):
         print("文件"+file+"排序完成")
 
 
-def divide_file(path):
+def divide_file(path,save_path = None): # 返回文件存储路径
     files = os.listdir(path)
+    save_path = path if not save_path else save_path
     for file_name in files:
         if "csv" not in file_name:
             continue
@@ -43,7 +44,7 @@ def divide_file(path):
         new_dir = 'redis' if 'redis' in file_name else new_dir
 
         # 建立一个新的目录
-        new_path = os.path.join(path, new_dir)
+        new_path = os.path.join(save_path, new_dir)
         if not os.path.exists(new_path):
             os.mkdir(new_path)
         # 存储所有指标对应的数据
@@ -58,11 +59,12 @@ def divide_file(path):
         # 将这些指标写入到文件
         print(file_name)
         for indicator_name, data in tqdm(data_of_indicators.items(), desc="写入文件中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
-            with open(os.path.join(new_path, indicator_name+".csv"), 'w', newline="") as fd:
+            p = os.path.join(new_path, indicator_name+".csv")
+            with open(p, 'w', newline="") as fd:
                 writer = csv.writer(fd)
                 for row in data:
                     writer.writerow(row)
-
+    return save_path
 
 def getKpi(timesta, comd_id=None):
     pass
