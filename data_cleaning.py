@@ -6,13 +6,19 @@ import sys
 import json
 from tqdm import tqdm
 import time
-prex_path_all = "/home/bdilab/aiops"
-if os.name=='nt':# windows , linux 是posix
-    prex_path_all = "F:\\aiops"
-p0 = prex_path_all+os.sep+'data_all'+os.sep+'2020_04_11'+os.sep
-path = p0+"调用链指标"
-path2 = p0+"平台指标"
-path3 = prex_path_all+os.sep+'data_release_v2.0'+os.sep+'数据说明'+os.sep
+
+def getPath():
+    prex_path_all = "/home/bdilab/aiops"
+    if os.name=='nt':# windows , linux 是posix
+        prex_path_all = "F:/aiops"
+    p0 = os.path.join(prex_path_all,"data_all","2020_04_11")
+    p1 = os.path.join(p0,"调用链指标")
+    p2 = os.path.join(p0,"平台指标")
+    p3 = os.path.join(p0,"数据说明")
+    return p1,p2,p3
+
+path, path2, path3 = getPath()
+
 fileNames = {'os': 'os_linux.csv', 'container': 'dcos_container.csv',
              'db': 'db_oracle_11g.csv', 'docker': 'dcos_docker.csv'}
 # datestamps=["datestamp=2020-02-14","datestamp=2020-02-15","datestamp=2020-02-16","datestamp=2020-02-17","datestamp=2020-02-18","datestamp=2020-02-19","datestamp=2020-02-20"]
@@ -20,25 +26,30 @@ datestamps = [""]
 traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
               "trace_remote_process", "trace_local", "trace_jdbc"]
 # deploys = {'csf_001': {"docker": "docker"}}
+##是否是执行者调用 
+isExecutor = {"JDBC":False,"LOCAL":False,"CSF":False,"FlyRemote":True,"OSB":True,"RemoteProcess":True}
 
-bias = 1*1000
+bias = 10*1000
 def main():
     time0 = time.time()
     if len(os.listdir(path2))<=5:
         divide_file(path2)
     save_path = os.path.join(path,"test_data.json")
     saveJson(build_trace(),save_path)
-    f2 = open(os.path.join(path,"one_trace.json"), "w")
-    with open(save_path, "r") as f:
-        line = f.readline()
-        # print(line)
-        js = json.loads(line)
-        f2.write(json.dumps(js, indent=4))
-        # trace = Trace(js)
-        # print(trace)
-        # print(trace.getGraph())
-    f2.close
+    # f2 = open(os.path.join(path,"problem_trace.json"), "w")
+    # with open(save_path, "r") as f:
+    #     line = f.readline()
+    #     while line:
+    #         js = json.loads(line)
+    #         startTime = int(js[list(js.keys())[0]]['startTime'])
+    #         if startTime>problemTime[0] and startTime<problemTime[1]:
+    #             f2.write(json.dumps(js, indent=4))
+    #             break
+    #         line = f.readline()
+    # f2.close
     print("程序运行完毕！花费: "+str(time.time()-time0)+" 秒")
+
+
 def build_trace():
     # todo 将所有文件合并成 trace
     res = {}
@@ -47,7 +58,7 @@ def build_trace():
     for day in datestamps:
         for traceName in traceNames:
             # csvName = "trace_csf"
-            p = os.path.join(path, traceName)+".csv"
+            p = os.path.join(path, traceName+".csv")
             print("正在读取文件 "+traceName)
             temp = readCSV(p)
             print("读取"+traceName+"完毕，开始生成trace")
@@ -192,6 +203,7 @@ def generate_span(row):
     span['cmdb_id'] = row[7]
     span["db"] = None if len(row) < 10 else row[-1].replace(
         '"', "").rstrip()
+    span['callType'] = row[0]
     # 通过其他文件获取其他 KPIs
     # span["KPIs"] = getKPIs(
     #     int(span["timestamp"]), span['cmdb_id'], span["db"])
