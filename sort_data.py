@@ -4,7 +4,7 @@ from tqdm import tqdm
 import os
 import csv
 import re
-path = "F:\\aiops\\data_all\\2020_04_11\\平台指标\\"
+path = "D:\\data\\data2.0\\2020_04_11\\调用链指标"
 
 
 def readCSV(path):
@@ -21,7 +21,7 @@ def order(path):
     for file in files:
         temp = readCSV(os.path.join(path , file))
         row_first = temp[0]
-        temp = sorted(temp[1:], key=lambda x: x[3])
+        temp = sorted(temp[1:], key=lambda x: x[1])
         new_name = file.split(".")[0]+"_sorted"
         with open(path+new_name+".csv", 'w', newline="") as fd:
             writer = csv.writer(fd)
@@ -69,8 +69,8 @@ def getKpi(timesta, comd_id=None):
 
 
 if __name__ == '__main__':
-    # order(path)
-    divide_file(path)
+    order(path)
+    #divide_file(path)
     # os.mkdir(path="F:\\aiops\\data_all\\2020_04_11\\平台指标\\test")
     # s = "dcos_container.csv"
     # print(re.split('[_.]',s))
