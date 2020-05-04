@@ -23,7 +23,7 @@ def readCSV(p):
     return res
 
 
-def readCWithPandas(p):
+def readCsvWithPandas(p):
     '''
     读取CSV文件， 通过pandas
     '''
