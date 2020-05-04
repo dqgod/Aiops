@@ -2,7 +2,8 @@ import numpy as np
 import csv
 import os
 import matplotlib.pyplot as plt
-path="D:\\data\\data2.0\\2020_04_11\\调用链指标\\Order_by_cmdid\\"
+import data_path
+path=os.path.join(data_path.get_data_path(),"调用链指标","Order_by_cmdid")
 def draw(value,title):
     plt.plot(value,color='r')
     plt.title(title)
@@ -21,7 +22,7 @@ def readCSV(p):
 if __name__ == '__main__':
     #value=[1,3,7,4,8,9,2,5,6,7,8]
     fileName="docker_003.csv"
-    filepath=path+fileName
+    filepath=os.path.join(path,fileName)
     res=np.array(readCSV(filepath))
     print(res.shape)
     print(1)

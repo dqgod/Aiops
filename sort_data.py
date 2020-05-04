@@ -4,16 +4,9 @@ from tqdm import tqdm
 import os
 import csv
 import re
-path = "D:\\data\\data2.0\\2020_04_11\\调用链指标"
-
-
-def readCSV(path):
-    
-    res = []
-    with open(path, 'r') as f:
-        reader = csv.reader(f)
-        res = list(reader)
-    return res
+from read_data import readCSV
+import data_path 
+path = os.path.join(data_path.get_data_path(),"调用链指标")
 
 
 def order(path):
@@ -71,8 +64,9 @@ def getKpi(timesta, comd_id=None):
 
 
 if __name__ == '__main__':
-    order(path)
-    #divide_file(path)
+    # order(path)
+    p = os.path.join(data_path.get_data_path(),"平台指标")
+    divide_file(p)
     # os.mkdir(path="F:\\aiops\\data_all\\2020_04_11\\平台指标\\test")
     # s = "dcos_container.csv"
     # print(re.split('[_.]',s))

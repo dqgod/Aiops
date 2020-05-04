@@ -1,9 +1,10 @@
 #%%
-from sort_data import readCSV
+from read_data import readCSV
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-path = "F:\\aiops\\data_all\\2020_04_11\\平台指标"
+import data_path
+path = os.path.join(data_path.get_data_path(),"平台指标")
 #%%
 # 获取KPI曲线数据,将所有指标数据读到内存 
 def getKpis(files = None):

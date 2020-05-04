@@ -6,15 +6,13 @@ import sys
 import json
 from tqdm import tqdm
 import time
-
+import data_path 
+from read_data import readCSV
 def getPath():
-    prex_path_all = "/home/bdilab/aiops"
-    if os.name=='nt':# windows , linux 是posix
-        prex_path_all = "F:/aiops"
-    p0 = os.path.join(prex_path_all,"data_all","2020_04_11")
-    p1 = os.path.join(p0,"调用链指标")
-    p2 = os.path.join(p0,"平台指标")
-    p3 = os.path.join(p0,"数据说明")
+    prex_path_all = data_path.get_data_path()
+    p1 = os.path.join(prex_path_all,"调用链指标")
+    p2 = os.path.join(prex_path_all,"平台指标")
+    p3 = os.path.join(prex_path_all,"数据说明")
     return p1,p2,p3
 
 path, path2, path3 = getPath()
@@ -87,16 +85,7 @@ def build_trace():
     print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
     return res
 
-def readCSV(p):
-    #todo 文件不存在直接返回
-    if not os.path.exists(p):
-        return []
-    # todo 读取文件，并以列表的形式返回
-    res = []
-    with open(p, 'r') as f:
-        reader = csv.reader(f)
-        res = list(reader)
-    return res
+
 
 
 # todo { cmd_id:{ timestamp:123456,values:{}}}

@@ -1,12 +1,9 @@
 # coding=utf-8
 
-import xlrd
+
 import os
-def read_xlrd(excelFile):
-    data = xlrd.open_workbook(excelFile)
-    table = data.sheet_by_index(0)
-    return table 
-    
+import data_path
+from read_data import read_xlrd
 def fill_indicator(table,indicator):
     table_head = table.row_values(0)
     name_index,bomc_id_index,collect_index = 0,0,0
@@ -37,5 +34,6 @@ def fill_all_indicators(path_prex):
     return indicators
 
 if __name__ == '__main__':
-    print(fill_all_indicators("F:\\aiops\\data_release_v2.0\\数据说明"))
+    path = os.path.join(data_path.get_data_path(),"数据说明")
+    print(fill_all_indicators(path))
     
