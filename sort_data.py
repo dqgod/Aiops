@@ -68,5 +68,5 @@ if __name__ == '__main__':
     # p = os.path.join(data_path.get_data_path(),"平台指标")
     # divide_file(p)
     # os.mkdir(path="F:\\aiops\\data_all\\2020_04_11\\平台指标\\test")
-    s = "2020/4/11  0:35:00"
-    print(re.split('[/:]|\s+',s))
+    s = "5min"
+    print(re.match('\d*',s))
