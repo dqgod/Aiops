@@ -9,13 +9,17 @@ import time
 import data_path 
 from read_data import readCSV
 def getPath():
+    '''
+    return (p1,p2,p3) (调用链指标,平台指标,数据说明)
+    '''
     prex_path_all = data_path.get_data_path()
     p1 = os.path.join(prex_path_all,"调用链指标")
     p2 = os.path.join(prex_path_all,"平台指标")
     p3 = os.path.join(prex_path_all,"数据说明")
     return p1,p2,p3
 
-path, path2, path3 = getPath()
+path, path2, path3 = getPath() #路径
+
 
 fileNames = {'os': 'os_linux.csv', 'container': 'dcos_container.csv',
              'db': 'db_oracle_11g.csv', 'docker': 'dcos_docker.csv'}
@@ -33,7 +37,7 @@ def main():
     if len(os.listdir(path2))<=5:
         divide_file(path2)
     save_path = os.path.join(path,"test_data.json")
-    saveJson(build_trace(),save_path)
+    saveJson(build_trace(path),save_path)
     # f2 = open(os.path.join(path,"problem_trace.json"), "w")
     # with open(save_path, "r") as f:
     #     line = f.readline()
@@ -48,7 +52,15 @@ def main():
     print("程序运行完毕！花费: "+str(time.time()-time0)+" 秒")
 
 
-def build_trace():
+def build_trace(path):
+    """[summary]
+
+    Args:
+        path ([str]):  trace调用链路径 \n
+
+    Returns:
+        [type]: traces字典 格式{traceId:{ startTime:str,spans:{spanId}}} \n
+    """
     # todo 将所有文件合并成 trace
     res = {}
     print("开始trace数据合并！")
@@ -85,9 +97,6 @@ def build_trace():
     print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
     return res
 
-
-
-
 # todo { cmd_id:{ timestamp:123456,values:{}}}
 kpis = {}  # 记录下指标
 # todo {db:{  indicator1:time1,indcator2:time2}}
@@ -119,11 +128,11 @@ file_now = {}
 
 def get_kpis_for_an_indicator(timeStamp, cmd_id, bomc_id, sample_period,file_path):
     '''
-    timeStamp:时间戳
-    cmd_id:类似docker_007
-    key: docker,cmd_id 前面部分，用作路径
-    indicator_name:指标名
-    sample_period:取样周期
+    timeStamp:时间戳 \n
+    cmd_id:类似docker_007   \n
+    key: docker,cmd_id 前面部分，用作路径   \n
+    indicator_name:指标名   \n
+    sample_period:取样周期  \n
     '''
     # todo 获取该指标文件存储路径
     res = ""
@@ -174,9 +183,6 @@ def binarySearch(res, timestamp, low, high):
     return low
 
 
-
-
-
 def generate_span(row):
     '''
     0 callType,1 startTime,2 elapsedTime,3 success,4 traceId,5 id,6 pid,7 cmdb_id,8 serviceName
@@ -224,7 +230,7 @@ def saveJson(res,save_path):
 
 def generate_KPIs_for_trace(trace):
     """
-    传入一条 trace， 并得到他的KPIs
+    传入一条 trace， 并得到他的KPIs \n
     trace格式 {starttime:111111, spans:{}}
     """
     spans = trace['spans']
@@ -244,10 +250,12 @@ def generate_KPIs_for_trace(trace):
 
 
 def generateGraph(trace_spans):
-    """
-    传入一条trace中的所有span 将他的所有span生成一个数据字典
-    数据字典的key为span_id, 其值是他字节点的id，是一个列表
-    trace_spans:{ span_id:{},span_id2:{}}
+    """传入一条trace中的所有span 将他的所有span生成一个数据字典数据字典的key为span_id, 其值是他字节点的id列表
+
+    Args:
+        trace_spans ([dict]): { span_id:{},span_id2:{}}\n
+    Returns:
+        graph ([dict]): {root:[id1,id2...],id1:[id3,id4..]}
     """
     graph = {}
     for key, val in trace_spans.items():
