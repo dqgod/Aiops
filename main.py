@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import data_path # 路径
 import data_cleaning
 from read_data import readCSV,read_xlrd
-from xlrd import
 from datetime import datetime
 from xlrd import xldate_as_tuple
 def main():
