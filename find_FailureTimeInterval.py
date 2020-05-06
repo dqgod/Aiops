@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import data_path
+import matplotlib.pyplot as plt
 from read_data import readCsvWithPandas, readCSV
 n = 3
 path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
@@ -35,4 +36,4 @@ def dq_find_time_interval():
     print(res[:,1])
 
 if __name__ == '__main__':
-    dq_find_time_interval()
+    failureTimeInterval()
