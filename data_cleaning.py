@@ -250,7 +250,7 @@ def generate_KPIs_for_trace(trace):
 
 
 def generateGraph(trace_spans):
-    """传入一条trace中的所有span 将他的所有span生成一个数据字典数据字典的key为span_id, 其值是他字节点的id列表
+    """传入一条trace中的所有span 将他的所有span生成一个数据字典数据字典的key为span_id, 其值是他子节点的id列表
 
     Args:
         trace_spans ([dict]): { span_id:{},span_id2:{}}\n

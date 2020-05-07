@@ -32,5 +32,5 @@ def readCsvWithPandas(p):
         return []
     # todo 读取文件，并以列表的形式返回
     res = []
-    res = pd.read_csv(p).values
+    res = pd.read_csv(p,engine="python").values
     return res
