@@ -21,15 +21,19 @@ def getPath():
 path, path2, path3 = getPath() #路径
 
 
-fileNames = {'os': 'os_linux.csv', 'container': 'dcos_container.csv',
-             'db': 'db_oracle_11g.csv', 'docker': 'dcos_docker.csv'}
+fileNames = data_path.fileNames
 # datestamps=["datestamp=2020-02-14","datestamp=2020-02-15","datestamp=2020-02-16","datestamp=2020-02-17","datestamp=2020-02-18","datestamp=2020-02-19","datestamp=2020-02-20"]
 datestamps = [""]
-traceNames = ["trace_osb", "trace_csf", "trace_fly_remote",
-              "trace_remote_process", "trace_local", "trace_jdbc"]
+traceNames = data_path.traceNames
 # deploys = {'csf_001': {"docker": "docker"}}
 ##是否是执行者调用 
 isExecutor = {"JDBC":False,"LOCAL":False,"CSF":False,"FlyRemote":True,"OSB":True,"RemoteProcess":True}
+# todo { cmd_id:{ timestamp:123456,values:{}}}
+kpis = {}  # 记录下指标
+# todo {db:{  indicator1:time1,indcator2:time2}}
+indicators = fill_all_indicators(path3)
+# todo 保存当前已经加载的 文件（后面可能会用到）
+file_now = {}
 
 bias = 10*1000
 def main():
@@ -97,10 +101,7 @@ def build_trace(path):
     print("Trace 合并完毕！共花费 " + str(sum(merge_time))+"S,分别是", merge_time)
     return res
 
-# todo { cmd_id:{ timestamp:123456,values:{}}}
-kpis = {}  # 记录下指标
-# todo {db:{  indicator1:time1,indcator2:time2}}
-indicators = fill_all_indicators(path3)
+
 
 def getKPIs(timeStamp, cmd_id, bias=0):
     if not cmd_id:
@@ -122,8 +123,7 @@ def getKPIs(timeStamp, cmd_id, bias=0):
     return valueJson
 
 
-# todo 保存当前已经加载的 文件（后面可能会用到）
-file_now = {}
+
 
 
 def get_kpis_for_an_indicator(timeStamp, cmd_id, bomc_id, sample_period,file_path):

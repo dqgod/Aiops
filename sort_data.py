@@ -65,8 +65,8 @@ def getKpi(timesta, comd_id=None):
 
 if __name__ == '__main__':
     # order(path)
-    # p = os.path.join(data_path.get_data_path(),"平台指标")
-    # divide_file(p)
+    p = os.path.join(data_path.get_data_path(),"平台指标")
+    divide_file(p)
     # os.mkdir(path="F:\\aiops\\data_all\\2020_04_11\\平台指标\\test")
-    s = "5min"
-    print(re.match('\d*',s))
+    # s = "5min"
+    # print(re.match('\d*',s))

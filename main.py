@@ -8,11 +8,13 @@ import data_cleaning
 from read_data import readCSV,read_xlrd
 from datetime import datetime
 from xlrd import xldate_as_tuple
+from show_Kpis import getKpis
+kpi_opened = {}
 def main():
-   
+    # 业务指标
     business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
     # 调用链指标,平台指标,数据说明
-    trace_p,plat_p,data_instruction_p = data_cleaning.getPath()
+    # trace_p,plat_p,data_instruction_p = data_cleaning.getPath()
     # 获取业务指标数据，去掉表头
     data = np.array(readCSV(business_path)[1:])
     #todo step1 异常时间序列
@@ -41,6 +43,34 @@ def find_abnormal_indicators(execption_Interval,cmdb_id):
         execption_Interval ([type]): [时间区间]
         cmdb_id ([type]): [网源]
     """
+    kpis = None
+    abnormal_indicators = []
+    # os,docker,db
+    file_name = data_path.fileNames[cmdb_id.split('_')[0]]
+    # file_path = os.path.join(data_path.get_data_path(),"平台指标",file_name)
+    # 查看当前文件是否已经分解
+    if kpi_opened.get(file_name)==None:
+        kpis = getKpis([file_name])
+        kpi_opened[file_name] = kpis
+    else :
+        kpi = kpi_opened[file_name]
+    # 逐个指标的进行判断
+    for k,v in kpi.items():
+        temp = k.split(',') #(cmdb_id,name,bomc_id,itemid)
+        if cmdb_id == temp[0]:
+            #todo 进行异常评估，给出得分
+            score = anomaly_detection(execption_Interval,v)
+            abnormal_indicators.append((temp[0],temp[1],temp[2],score))
+    # 排序返回得分最高的三个
+    return sorted(abnormal_indicators,key=lambda x:x[3],reversed=True)[:3]
+
+def anomaly_detection(execption_Interval,data):
+    """[异常检测算法]
+
+    Args:
+        execption_Interval ([tutle]): [时间区间(start-time,end-time)]
+        data ([type]): [description]
+    """
     pass
 
 def find_abnormal_span(trace):
@@ -52,17 +82,32 @@ def find_abnormal_span(trace):
     Returns:
         [list]: 返回异常节点       \n
     """
+    abnormal_spans = []
+    spans = trace['spans']
     graph = data_cleaning.generateGraph()
+    def deep_first(root):
+        if graph.get(root)==None:
+            #todo 到达叶子节点
+            #todo do something
+            return 
+        for span_id in graph[root]:
+            deep_first(span_id)
+
     pass
 
 def find_abnormal_trace(execption_Interval,traces):
     """找到改异常区间内所有trace
-
+    
     Args:
         execption_Interval ([type]): [时间区间]
         traces ([type]): [description]
     """
-    pass
+    res = []
+    for trace in traces.values():
+        startTime = int(trace['startTime'])
+        if startTime>execption_Interval[0] and startTime<execption_Interval[1]:
+            res.append(trace)
+    return res
 
 def fault_time(bias=0):
     table = read_xlrd(os.path.join(data_path.get_data_path(),"数据说明","0故障内容.xlsx"))     
