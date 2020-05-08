@@ -23,9 +23,8 @@ if __name__ == '__main__':
         res=readCsvWithPandas(os.path.join(path,file))
         timeStamp=res[:,1]
         dateTime=timeStamp_to_datetime(timeStamp)
-        for i in tqdm(range(len(res)), desc="转换数据格式"+file, ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
-            res[i]=dateTime[i]
-           # dateTime=dateTime[1:]
+        #for i in tqdm(range(len(res)), desc="转换数据格式"+file, ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
+        res[:,1]=dateTime
         with open(os.path.join(path,"dateTimeStyle\\"+file),"w",newline="") as csvfile:
             writer=csv.writer(csvfile)
             writer.writerows(res)
