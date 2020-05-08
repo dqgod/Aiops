@@ -26,8 +26,7 @@ fileNames = data_path.fileNames
 datestamps = [""]
 traceNames = data_path.traceNames
 # deploys = {'csf_001': {"docker": "docker"}}
-##是否是执行者调用 
-isExecutor = {"JDBC":False,"LOCAL":False,"CSF":False,"FlyRemote":True,"OSB":True,"RemoteProcess":True}
+
 # todo { cmd_id:{ timestamp:123456,values:{}}}
 kpis = {}  # 记录下指标
 # todo {db:{  indicator1:time1,indcator2:time2}}
