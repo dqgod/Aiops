@@ -26,7 +26,7 @@ def failureTimeInterval():
 
 
 def dq_find_time_interval():
-    data = np.array(readCSV(path)[1:])
+    data = readCsvWithPandas(path)
     avg_times = data[:, 2].astype(np.float32)
     succee_rate = data[:, 5].astype(np.float32)
     std = np.std(avg_times, ddof=1)
