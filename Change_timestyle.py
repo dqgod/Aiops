@@ -24,8 +24,8 @@ if __name__ == '__main__':
         timeStamp=res[:,1]
         dateTime=timeStamp_to_datetime(timeStamp)
         for i in tqdm(range(len(res)), desc="转换数据格式"+file, ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
-            res[i]=dateTime[0]
-            dateTime=dateTime[1:]
+            res[i]=dateTime[i]
+           # dateTime=dateTime[1:]
         with open(os.path.join(path,"dateTimeStyle\\"+file),"w",newline="") as csvfile:
             writer=csv.writer(csvfile)
             writer.writerows(res)
