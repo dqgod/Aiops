@@ -1,4 +1,4 @@
-#%%
+# %%
 import numpy as np
 import os
 import sys
@@ -7,14 +7,17 @@ import json
 import matplotlib.pyplot as plt
 import data_path  # 路径
 import data_cleaning
-from read_data import readCSV, read_xlrd,readCsvWithPandas
+from read_data import readCSV, read_xlrd, readCsvWithPandas
 from datetime import datetime
 from xlrd import xldate_as_tuple
 from show_Kpis import getKpis
 kpi_opened = {}
-##是否是执行者调用   
-isExecutor = {"JDBC":False,"LOCAL":False,"CSF":False,"FlyRemote":True,"OSB":True,"RemoteProcess":True}
-#%%
+# 是否是执行者调用
+isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
+              "FlyRemote": True, "OSB": True, "RemoteProcess": True}
+# %%
+
+
 def find_abnormal_indicators(execption_Interval, cmdb_id):
     """[该时间区间内那个指标错误]
 
@@ -43,6 +46,7 @@ def find_abnormal_indicators(execption_Interval, cmdb_id):
     # 排序返回得分最高的三个
     return sorted(abnormal_indicators, key=lambda x: x[3], reversed=True)[:3]
 
+
 def anomaly_detection(execption_Interval, data):
     """[异常检测算法]
 
@@ -63,38 +67,39 @@ def find_abnormal_span(trace):
     spans = trace['spans']
     graph = data_cleaning.generateGraph(spans)
     abnormal_cmdb_ids = []
-    net_fault = 0
     Break = True
     # isError代表上溯的节点是否有异常
-    def traverse(root_id,abn_ids,isError=False):
+
+    def traverse(root_id, abn_ids, isError=False):
         root = spans[root_id]
-        if isExecutor[root['callType']] and root['callType']!='OSB' and \
-            float(root['duration'])>1000:
-            abn_ids.append(root["cmdb_id"])
-            net_fault += 1
         # 如果上溯有异常或本身有异常
         if isError or root['success'] == 'False':
-            if isExecutor[root['callType']] and root['callType']!='OSB':
-                abn_ids.append(root["cmdb_id"])
             # 当发现是数据库出现问题时，将其他的清空，只保存数据库cmdb_id,并退出递归
             if root['db'] and root['success'] == 'False':
                 abn_ids.clear()
                 abn_ids.append(root["db"])
                 return Break
-            isError = True
+            # 找出上一个失败的下一个成功
+            if isExecutor[root['callType']] and root['callType'] != 'OSB' \
+                and root['success'] == 'True':
+                
+                abn_ids.clear()
+                abn_ids.append(root["cmdb_id"])
+        isError = root['success'] == 'False'
         # 如果没有子节点，直接返回
         if graph.get(root_id) == None:
             return not Break
         for span_id in graph[root_id]:
-            if traverse(span_id,abn_ids,isError)==Break:
+            if traverse(span_id, abn_ids, isError) == Break:
                 return Break
         return not Break
 
     for root_id in graph['root']:
         abn_ids = []
-        traverse(root_id,abn_ids)
+        traverse(root_id, abn_ids)
         abnormal_cmdb_ids += abn_ids
     return list(set(abnormal_cmdb_ids))
+
 
 def find_abnormal_trace(execption_Interval, traces):
     """找到改异常区间内所有trace
@@ -173,11 +178,12 @@ def draw(data):
 
     plt.show()
 
+
 # %%
 # 业务指标
 business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
 # 调用链指标,平台指标,数据说明
-trace_p,plat_p,data_instruction_p = data_cleaning.getPath()
+trace_p, plat_p, data_instruction_p = data_cleaning.getPath()
 # 获取业务指标数据，去掉表头
 data = readCsvWithPandas(business_path)
 # todo step1 异常时间序列
@@ -186,18 +192,13 @@ execption_times = find_time_interval(data)
 # todo step2 异常时间区间
 # period_times = to_period_time(execption_times)
 period_times = fault_time()
-#%%
+# %%
 # todo step3 获取所有trace
 traces = data_cleaning.build_trace(trace_p)
 
-#%%
-# trace0 = list(traces.values())[0]
-# g = data_cleaning.generateGraph(trace0['spans'])
-# with open('graph.json','w') as f:
-#     js = json.dumps(g,indent=4)
-#     f.write(js)
+# %%
 # todo step4 找出这段时间内的trace
-for i,execption_Interval in enumerate(period_times):
+for i, execption_Interval in enumerate(period_times):
     # execption_Interval = (0,15865349796310)
     abnormal_traces = find_abnormal_trace(execption_Interval, traces)
     # print(len(abnormal_traces))
@@ -205,14 +206,14 @@ for i,execption_Interval in enumerate(period_times):
     # todo step5 找出异常数据中的异常节点
     for trace in abnormal_traces:
         #! 以下未实现
-        abnormal_cmdb_ids +=find_abnormal_span(trace)
+        abnormal_cmdb_ids += find_abnormal_span(trace)
     abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
-    print(i+1,abnormal_cmdb_ids)
+    print(i+1, abnormal_cmdb_ids)
     # todo step6 判断该节点是哪个指标有异常
     # for cmdb_id in abnormal_cmdb_ids:
     #     # ? 找到异常指标
     #     abnormal_indicators = find_abnormal_indicators(
     #         execption_Interval, cmdb_id)
-      
-    
+
+
 # %%
