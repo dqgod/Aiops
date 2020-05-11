@@ -215,12 +215,10 @@ def saveJson(res,save_path):
     start_time = time.time()
     with open(save_path, 'w') as f:
         # res中每一条数据都是 traceId: {starttime:111111, spans:{}}
-        items = list(res.items())
-        length = len(items)  # 数据量
-        for i in tqdm(range(length), desc="保存数据中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
+        for traceId, trace in tqdm(res.items(), desc="保存数据中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
             # ? 保存数据时同时 得到 KPIs
             # traceId, {starttime:111111, spans:{}}
-            traceId, trace = items.pop(0)
+            # traceId, trace = items.pop(0)
             #generate_KPIs_for_trace(trace)
             f.write('{"'+traceId+'": '+processJson(trace)+"}\n")
 
