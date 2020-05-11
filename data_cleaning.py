@@ -221,7 +221,7 @@ def saveJson(res,save_path):
             # ? 保存数据时同时 得到 KPIs
             # traceId, {starttime:111111, spans:{}}
             traceId, trace = items.pop(0)
-            generate_KPIs_for_trace(trace)
+            #generate_KPIs_for_trace(trace)
             f.write('{"'+traceId+'": '+processJson(trace)+"}\n")
 
     print("保存完毕!花费 "+str(time.time()-start_time)+"S")
