@@ -2,6 +2,7 @@ import xlrd
 import os
 import csv
 import pandas as pd
+import json
 def read_xlrd(excelFile):
     '''
     读取Execel
@@ -34,3 +35,10 @@ def readCsvWithPandas(p):
     res = []
     res = pd.read_csv(p,engine="python").values
     return res
+def read_json(p):
+    if not os.path.exists(p):
+        return []
+    res=[]
+    with open(p,'r')as f:
+        json_data=json.load(f)
+        return json_data

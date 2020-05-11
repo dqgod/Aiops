@@ -1,15 +1,23 @@
+#%%
 import csv
 import os
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-
+import data_cleaning
 import data_path
 import matplotlib.pyplot as plt
 from read_data import readCsvWithPandas, readCSV
 n = 3
-path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
+path = os.path.join(data_path.get_data_path(), "调用链指标")
+#%%
+path2=data_path.get_data_path()
+trace_path=os.path.join(path2,"调用链指标")
+print(trace_path)
+trace=data_cleaning.build_trace(trace_path)
 
+#%%
+data_cleaning.saveJson(trace,trace_path+"\\trace.json")
 
 def threeSigma(timeStamp, avg_time, succee_rate):
 
@@ -38,11 +46,8 @@ def dq_find_time_interval():
     print(res[:,1])
 
 if __name__ == '__main__':
-    failureTimeInterval()
-    res2=readCsvWithPandas(path)
-    res=res2[:,2]
-    # 建立MinMaxScaler对象
-    minmax = preprocessing.MinMaxScaler()
-    # 标准化处理
-    
+    # start=1586536500014
+    # end=1586536794160
+    print("完成")
 
+# %%
