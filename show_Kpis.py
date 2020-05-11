@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import data_path
 path = os.path.join(data_path.get_data_path(),"平台指标")
+print(path)
 #%%
 def getKpis(files = None):
     """[获取KPI曲线数据,将所有指标数据读到内存]
@@ -82,7 +83,7 @@ def main():
     print("画图中：")
     showKpiCurve(kpis,filter_list)
 
-# main()
+main()
 
 
 # %%

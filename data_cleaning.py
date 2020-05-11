@@ -72,10 +72,10 @@ def build_trace(path):
         for traceName in traceNames:
             # csvName = "trace_csf"
             p = os.path.join(path, traceName+".csv")
+            time1 = time.time()
             print("正在读取文件 "+traceName)
             temp = readCSV(p)
             print("读取"+traceName+"完毕，开始生成trace")
-            time1 = time.time()
             for i in tqdm(range(len(temp)-1), desc=traceName, ncols=100, ascii=' =', bar_format='{l_bar}{bar}|'):
                 # 0 callType,1 startTime,2 elapsedTime,3 success,4 traceId,5 id,6 pid,7 cmdb_id,8 serviceName
                 row = temp[i+1]

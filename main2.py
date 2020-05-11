@@ -44,7 +44,7 @@ def find_abnormal_indicators(execption_Interval, cmdb_id):
             score = anomaly_detection(execption_Interval, v)
             abnormal_indicators.append((temp[0], temp[1], temp[2], score))
     # 排序返回得分最高的三个
-    return sorted(abnormal_indicators, key=lambda x: x[3], reversed=True)[:3]
+    return abnormal_indicators
 
 
 def anomaly_detection(execption_Interval, data):
@@ -52,8 +52,10 @@ def anomaly_detection(execption_Interval, data):
 
     Args:
         execption_Interval ([tutle]): [时间区间(start-time,end-time)]
-        data ([type]): [description]
+        data ([type]): [itemid,name,bomc_id,timestamp,valuee,cmdb_id]
     """
+    
+
     pass
 
 
@@ -66,10 +68,12 @@ def find_abnormal_span(trace):
     """
     spans = trace['spans']  
     graph = data_cleaning.generateGraph(spans)
+    if graph.get('root') == None:
+        return []
+
     abnormal_cmdb_ids = []
     Break = True
     # isError代表上溯的节点是否有异常
-
     def traverse(root_id, abn_ids, isError=False):
         root = spans[root_id]
         # 如果上溯有异常或本身有异常
@@ -82,7 +86,6 @@ def find_abnormal_span(trace):
             # 找出上一个失败的下一个成功
             if isExecutor[root['callType']] and root['callType'] != 'OSB' \
                 and root['success'] == 'True':
-                
                 abn_ids.clear()
                 abn_ids.append(root["cmdb_id"])
         isError = root['success'] == 'False'
@@ -94,11 +97,11 @@ def find_abnormal_span(trace):
                 return Break
         return not Break
 
-    for root_id in graph['root']:
+    for span_id in graph.get('root'):
         abn_ids = []
-        traverse(root_id, abn_ids)
+        traverse(span_id, abn_ids)
         abnormal_cmdb_ids += abn_ids
-    return list(set(abnormal_cmdb_ids))
+    return abnormal_cmdb_ids
 
 
 def find_abnormal_trace(execption_Interval, traces):
@@ -160,7 +163,7 @@ def find_time_interval(data):
     return res[:, 1].astype(np.int64)
 
 
-def to_period_time(timestamps, bias=3*60*1000):
+def to_period_time(timestamps, bias=1.5*60*1000):
     '''
     将时间戳的序列转换为时间段,区间合并
     '''
@@ -210,14 +213,17 @@ def draw(data,period_times=None):
 
     plt.show()
 
-
+ 
 # %%
+# 结果
+result = []
 # 业务指标
 business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
 # 调用链指标,平台指标,数据说明
 trace_p, plat_p, data_instruction_p = data_cleaning.getPath()
 # 获取业务指标数据，去掉表头
 data = readCsvWithPandas(business_path)
+# 根据时间序列排序
 data = data[np.argsort(data[:,1])]
 # todo step1 异常时间序列
 execption_times = find_time_interval(data)
@@ -227,7 +233,8 @@ period_times = to_period_time(execption_times)
 # for i in period_times:
 #     print(i)
 # 画出找到的异常区间
-# draw(data,period_times)
+draw(data,period_times)
+
 # period_times = fault_time()
 # %%
 # todo step3 获取所有trace
@@ -251,6 +258,9 @@ for i, execption_Interval in enumerate(period_times):
     #     # ? 找到异常指标
     #     abnormal_indicators = find_abnormal_indicators(
     #         execption_Interval, cmdb_id)
+    #     #sorted(abnormal_indicators, key=lambda x: x[3], reversed=True)[:3]
+    #     result.append(abnormal_indicators)
 
+# print(result)
 
 # %%
