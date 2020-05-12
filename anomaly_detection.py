@@ -18,9 +18,11 @@ n = 3
 # %%
 
 
-def find_time_interval(data):
+def find_abnormal_data(data):
     """
     在入口服务中，找到异常的数据的时间戳
+    data: [serviceName,startTime,avg_time,num,succee_num,succee_rate]
+    return: np.array(),返回异常数据
     """
     avg_times = data[:, 2].astype(np.float32)
     # 大于1的数据舍弃，不去计算均值和方差
@@ -32,13 +34,12 @@ def find_time_interval(data):
     high = means+3*std
     low = means-3*std
     # print(high,low)
-    def lam(
-        i): return avg_times[i] > high or avg_times[i] < low or succee_rate[i] < 1
+    def lam(i): return avg_times[i] > high or avg_times[i] < low or succee_rate[i] < 1
     res = data[list(filter(lam,  range(len(data))))]
-    return res[:, 1].astype(np.int64)
+    return res
 
 
-def to_period_time(timestamps, bias=1.5*60*1000):
+def to_interval(timestamps, bias=1.5*60*1000):
     '''
     将时间戳的序列转换为时间段,区间合并
     '''
@@ -57,6 +58,27 @@ def to_period_time(timestamps, bias=1.5*60*1000):
     r = list(map(lambda t: [t-bias, t+bias], timestamps))
     return merge(r)
 
+def is_net_error_func(intervals,abnormal_data):
+    '''
+    abnormal_data: [serviceName,startTime,avg_time,num,succee_num,succee_rate]，异常数据
+    '''
+    timestamps = abnormal_data[:, 1].astype(np.float32)
+    succee_rates = abnormal_data[:, 5].astype(np.float32)
+
+    is_net_error = []
+    for interval in intervals:
+        total, succee_rate_equal_one = 0, 0
+        start,end = interval[0],interval[1]
+        for timestamp, succee_rate in zip(timestamps,succee_rates):
+            if timestamp >= end:
+                break
+            if timestamp > start:
+                succee_rate_equal_one += 1 if float(succee_rate)>=1 else 0
+                total += 1
+        # print(total, succee_rate_equal_one)
+        succee_rate_not_equal_one = total-succee_rate_equal_one
+        is_net_error.append(succee_rate_equal_one/total > 0.9)
+    return is_net_error
 
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     ilf = IsolationForest(n_estimators=n_estimators,
@@ -158,3 +180,26 @@ def draw_abnormal_period(data,period_times=None):
 #     print(t)
 
 # %%
+if __name__ == "__main__":
+
+    # 业务指标
+    business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
+
+    # 获取业务指标数据，去掉表头,np.array
+    data = readCsvWithPandas(business_path)
+    # 根据时间序列排序
+    data = data[np.argsort(data[:, 1])]
+    # todo step1 异常时间序列
+    # 异常数据
+    abnormal_data = find_abnormal_data(data)
+    # 异常时间序列
+    execption_times = abnormal_data[:, 1].astype(np.int64)
+    # 异常时间区间
+    interval_times = to_interval(execption_times)
+    is_net_error = is_net_error_func(interval_times,abnormal_data)
+    print(len(interval_times))
+    # period_times = anomaly_detection.fault_time()
+    for i,j in zip(interval_times,is_net_error):
+        print(i,j)
+    # 画出找到的异常区间
+    draw_abnormal_period(data, interval_times)

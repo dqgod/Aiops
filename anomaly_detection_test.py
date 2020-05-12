@@ -63,26 +63,3 @@ for i in range(shape//batch+1):
 data['pred'] = all_pred
 data.to_csv('outliers.csv', columns=["pred", ], header=False)
 
-
-# %%
-def iforest(data,cols,n_estimators=100,n_jobs=-1,verbose=2):
-    ilf = IsolationForest(n_estimators=n_estimators,
-                      n_jobs=n_jobs,          # 使用全部cpu
-                      verbose=verbose,
-                      )
-    # 选取特征，不使用标签(类型)
-    X_cols = cols
-    print (data.shape)
-    # 训练
-    ilf.fit(data[X_cols])
-    shape = data.shape[0]
-    batch = 10**6
-    all_pred = []
-    for i in range(shape//batch+1):
-        start = i * batch
-        end = (i+1) * batch
-        test = data[X_cols][start:end]
-        # 预测
-        pred = ilf.predict(test)
-        all_pred.extend(pred)
-    return all_pred

@@ -12,9 +12,9 @@ from read_data import readCSV, read_xlrd, readCsvWithPandas
 from datetime import datetime
 from xlrd import xldate_as_tuple
 from show_Kpis import getKpis
-import anomaly_detection 
+import anomaly_detection
 kpi_opened = {}
-left_n = 3 # 保留几个结果
+left_n = 10  # 保留几个结果
 # 是否是执行者调用
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
@@ -58,18 +58,19 @@ def anomaly_detection_func(execption_Interval, data):
         data ([type]): [itemid,name,bomc_id,timestamp,valuee,cmdb_id]
     """
     data = pd.DataFrame(data)
-    data.columns=['itemid', 'name', 'bomc_id', 'timestamp', 'value', 'cmdb_id']
+    data.columns = ['itemid', 'name', 'bomc_id',
+                    'timestamp', 'value', 'cmdb_id']
     # 根据时间戳排序
-    data.sort_values("timestamp",inplace=True)
+    data.sort_values("timestamp", inplace=True)
     # 得到预测值
-    pred = anomaly_detection.iforest(data,["value"])
+    pred = anomaly_detection.iforest(data, ["value"])
     timestamps = data['timestamp'].values.astype(np.int64)
-    total, abnormal_data_total = 0,0
-    for timestamp, pred_num in zip(timestamps,pred):
-        if timestamp<execption_Interval[1] and timestamp>execption_Interval[0]:
+    total, abnormal_data_total = 0, 0
+    for timestamp, pred_num in zip(timestamps, pred):
+        if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
             total += 1
-            abnormal_data_total += 1 if pred_num==-1 else 0
-    
+            abnormal_data_total += 1 if pred_num == -1 else 0
+
     return abnormal_data_total
 
 
@@ -80,7 +81,7 @@ def find_abnormal_span(trace):
     Returns:
         [list]: 返回异常节点       \n
     """
-    spans = trace['spans']  
+    spans = trace['spans']
     graph = data_cleaning.generateGraph(spans)
     if graph.get('root') == None:
         return []
@@ -88,6 +89,7 @@ def find_abnormal_span(trace):
     abnormal_cmdb_ids = []
     Break = True
     # isError代表上溯的节点是否有异常
+
     def traverse(root_id, abn_ids, isError=False):
         root = spans[root_id]
         # 如果上溯有异常或本身有异常
@@ -99,7 +101,7 @@ def find_abnormal_span(trace):
                 return Break
             # 找出上一个失败的下一个成功
             if isExecutor[root['callType']] and root['callType'] != 'OSB' \
-                and root['success'] == 'True':
+                    and root['success'] == 'True':
                 abn_ids.clear()
                 abn_ids.append(root["cmdb_id"])
         isError = root['success'] == 'False'
@@ -133,9 +135,6 @@ def find_abnormal_trace(execption_Interval, traces):
     return abnormal_trace
 
 
-
-
- 
 # %%
 # 结果
 result = []
@@ -143,53 +142,69 @@ result = []
 business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
 # 调用链指标,平台指标,数据说明
 trace_p, plat_p, data_instruction_p = data_cleaning.getPath()
-# 获取业务指标数据，去掉表头
+# 获取业务指标数据，去掉表头,np.array
 data = readCsvWithPandas(business_path)
 # 根据时间序列排序
-data = data[np.argsort(data[:,1])]
+data = data[np.argsort(data[:, 1])]
 # todo step1 异常时间序列
-execption_times = anomaly_detection.find_time_interval(data)
-# todo step2 异常时间区间
-period_times = anomaly_detection.to_period_time(execption_times)
-print(len(period_times))
+# 异常数据
+abnormal_data = anomaly_detection.find_abnormal_data(data)
+# 异常时间序列
+execption_times = abnormal_data[:, 1].astype(np.int64)
+#! 异常时间区间
+interval_times = anomaly_detection.to_interval(execption_times)
+#! 对应时间区间是否是网络故障
+is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
+print(len(interval_times))
 # period_times = anomaly_detection.fault_time()
-# for i in period_times:
-#     print(i)
+# for i,j in zip(interval_times,is_net_error):
+#     print(i,j)
 # 画出找到的异常区间
-anomaly_detection.draw_abnormal_period(data,period_times)
+anomaly_detection.draw_abnormal_period(data, interval_times)
 
 # %%
-# todo step3 获取所有trace
+# todo step2 获取所有trace
 traces = data_cleaning.build_trace(trace_p)
 
 # %%
-# todo step4 找出这段时间内的trace
-for i, execption_Interval in enumerate(period_times):
-    # execption_Interval = (0,15865349796310)
-    abnormal_traces = find_abnormal_trace(execption_Interval, traces)
-    # print(len(abnormal_traces))
-    abnormal_cmdb_ids = []
-    # todo step5 找出异常数据中的异常节点
-    for trace in abnormal_traces:
-        #! 以下未实现
-        abnormal_cmdb_ids += find_abnormal_span(trace)
-    abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
-    print(i+1, abnormal_cmdb_ids)
-    # todo step6 判断该节点是哪个指标有异常
+#? 遍历每一个时间端
+for i in range(len(interval_times)):
+    # 异常时间区间
+    execption_Interval = interval_times[i]
+    # 异常指标
     abnormal_indicators = []
-    for cmdb_id in abnormal_cmdb_ids:
-        # ? 找到异常指标
-        abnormal_indicators.extend(find_abnormal_indicators(
-            execption_Interval, cmdb_id))
-    abnormal_indicators = sorted(abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
+    # 如果是网络故障
+    if is_net_error[i]:
+        #do something
+        # abnormal_indicators.append( [find_net_cmdb(abnormal_indicators)] )
+        pass 
+    else :
+        # todo step3 找出这段时间内的trace
+        abnormal_traces = find_abnormal_trace(execption_Interval, traces)
+        # abnormal_traces trace 中定位到具的体节点，即cmdb_id
+        abnormal_cmdb_ids = []
+        # todo step4 找出异常数据中的异常节点
+        for trace in abnormal_traces:
+            abnormal_cmdb_ids += find_abnormal_span(trace)
+        # 去重
+        abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
+        print(i+1, abnormal_cmdb_ids)
+        # todo step5 判断网元节点中是哪个指标有异常
+        for cmdb_id in abnormal_cmdb_ids:
+            # ? 找到异常指标
+            abnormal_indicators.extend(find_abnormal_indicators(
+                execption_Interval, cmdb_id))
+        # 对得到的异常指标进行排序
+        abnormal_indicators = sorted(
+            abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
     result.append(np.array(abnormal_indicators))
 
-for r in result:
-    print(r)
+# for r in result:
+#     print(r)
 
 # %%
-with open("result",'w') as f:
-    for i,r in enumerate(result):
+with open("result", 'w') as f:
+    for i, r in enumerate(result):
         f.write(str(i+1)+":\n")
         for o in r:
             f.write(str(o)+'\n')

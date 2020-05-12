@@ -6,5 +6,4 @@ csv*
 test*
 .vscode
 .idea
-count.json
 outliers.csv
