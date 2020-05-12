@@ -14,6 +14,7 @@ from xlrd import xldate_as_tuple
 from show_Kpis import getKpis
 import anomaly_detection 
 kpi_opened = {}
+left_n = 3 # 保留几个结果
 # 是否是执行者调用
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
@@ -180,7 +181,7 @@ for i, execption_Interval in enumerate(period_times):
         # ? 找到异常指标
         abnormal_indicators.extend(find_abnormal_indicators(
             execption_Interval, cmdb_id))
-    abnormal_indicators = sorted(abnormal_indicators, key=lambda x: x[-1], reverse=True)[:3]
+    abnormal_indicators = sorted(abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
     result.append(np.array(abnormal_indicators))
 
 for r in result:
