@@ -1,7 +1,7 @@
 test_demo.py
 __pycache__
 buildGraph*
-
+anomaly_detection_test*
 data_cleaning3.py
 csv*
 test*

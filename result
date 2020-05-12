@@ -1,0 +1,32 @@
+1:
+['docker_003' 'container_cpu_used' 'ZJ-004-059' '4']
+['docker_003' 'container_mem_used' 'ZJ-004-060' '4']
+['docker_003' 'container_session_used' 'ZJ-004-058' '0']
+2:
+3:
+4:
+['docker_004' 'container_cpu_used' 'ZJ-004-059' '4']
+['docker_004' 'container_thread_idle' 'ZJ-004-063' '0']
+['docker_004' 'container_thread_running' 'ZJ-004-062' '0']
+5:
+['db_007' 'MEM_Used' 'ZJ-002-052' '6']
+['db_007' 'MEM_real_util' 'ZJ-002-053' '6']
+['db_007' 'MEM_Used_Pct' 'ZJ-002-025' '6']
+6:
+['docker_002' 'container_cpu_used' 'ZJ-004-059' '4']
+['docker_002' 'container_mem_used' 'ZJ-004-060' '2']
+['docker_002' 'container_thread_idle' 'ZJ-004-063' '0']
+7:
+8:
+['docker_003' 'container_session_used' 'ZJ-004-058' '0']
+['docker_003' 'container_fgc' 'ZJ-004-103' '0']
+['docker_003' 'container_thread_used_pct' 'ZJ-004-061' '0']
+9:
+10:
+['docker_001' 'container_session_used' 'ZJ-004-058' '0']
+['docker_001' 'container_thread_total' 'ZJ-004-064' '0']
+['docker_001' 'container_fgc' 'ZJ-004-103' '0']
+11:
+['db_003' 'Sess_Connect' 'ZJ-002-012' '6']
+['db_003' 'MEM_Used' 'ZJ-002-052' '6']
+['db_003' 'Login_Per_Sec' 'ZJ-002-017' '6']
