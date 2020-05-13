@@ -30,6 +30,27 @@
             "Sess_Used_Temp"
         ]
     ],
+    "6": [
+        "os",
+        "os_021",
+        [
+            null
+        ]
+    ],
+    "8": [
+        "docker",
+        "docker_001",
+        [
+            null
+        ]
+    ],
+    "9": [
+        "docker",
+        "docker_004",
+        [
+            null
+        ]
+    ],
     "10": [
         "docker",
         "docker_003",
@@ -43,6 +64,13 @@
             "container_fgct",
             "container_thread_running",
             "container_thread_idle"
+        ]
+    ],
+    "11": [
+        "docker",
+        "docker_001",
+        [
+            null
         ]
     ]
 }

@@ -20,7 +20,7 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_11'
+day = '2020_04_22'
 # %%
 
 
@@ -88,7 +88,6 @@ def find_abnormal_span(trace):
     graph = data_cleaning.generateGraph(spans)
     if graph.get('root') == None:
         return []
-
     abnormal_cmdb_ids = []
     Break = True
     # isError代表上溯的节点是否有异常
@@ -240,7 +239,7 @@ with open(os.path.join(save_path,"result_"+day), 'w') as f:
             f.write(str(o)+'\n')
 
 answer = to_standard_answer(result)
-with open(os.path.join(save_path,"answer_"+day), 'w') as f:
+with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
     js = json.dumps(answer, indent=4)
     f.write(js)
 

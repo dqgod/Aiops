@@ -25,6 +25,9 @@ def count(traces):
             parent_span_id=span['parentId']
             if parent_span_id=='root':
                 continue
+            # 会出现父ID 的span不存在的情况
+            if trace['spans'].get(parent_span_id) == None:
+                continue
             parent_span=trace['spans'][parent_span_id]
             key=parent_span['cmdb_id']+'->'+span['cmdb_id']
             value=float(parent_span["duration"])-float(span['duration'])
