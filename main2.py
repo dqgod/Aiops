@@ -18,6 +18,8 @@ left_n = 10  # 保留几个结果
 # 是否是执行者调用
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
+# 哪一天的数据
+day = '2020_04_22'
 # %%
 
 
@@ -134,14 +136,29 @@ def find_abnormal_trace(execption_Interval, traces):
             abnormal_trace.append(trace)
     return abnormal_trace
 
+def to_standard_answer(result):
+    answer = {}
+    # 异常时间段
+    for i,a_result in enumerate(result):
+        if len(a_result)==0:
+            continue
+        cmdb = a_result[-1][0].split("_")[0] # docker
+        answer[str(i+1)]=[ cmdb, a_result[-1][0] ] # docker_001
+        if len(a_result)==1:
+            continue
+        # 每一个异常时间段有多个指标
+        indicator_list = [an_indicator[1] for an_indicator in a_result]
+        answer[str(i+1)].append(indicator_list)
+    return answer
 
 # %%
 # 结果
 result = []
-# 业务指标
-business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
+path_prex = data_path.get_data_path(day)
+
+business_path = os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv")
 # 调用链指标,平台指标,数据说明
-trace_p, plat_p, data_instruction_p = data_cleaning.getPath()
+trace_p, plat_p, data_instruction_p = data_cleaning.getPath(day)
 # 获取业务指标数据，去掉表头,np.array
 data = readCsvWithPandas(business_path)
 # 根据时间序列排序
@@ -167,20 +184,23 @@ anomaly_detection.draw_abnormal_period(data, interval_times)
 traces = data_cleaning.build_trace(trace_p)
 
 # %%
+abnormal_cmdb_all = []
 #? 遍历每一个时间端
 for i in range(len(interval_times)):
     # 异常时间区间
     execption_Interval = interval_times[i]
     # 异常指标
     abnormal_indicators = []
+    # todo step3 找出这段时间内的trace
+    abnormal_traces = find_abnormal_trace(execption_Interval, traces)
     # 如果是网络故障
+    is_net_error[i] = False
     if is_net_error[i]:
         #do something
-        # abnormal_indicators.append( [find_net_cmdb(abnormal_indicators)] )
+        # net_error_cmdb_id = find_net_cmdb(abnormal_indicators)
+        # abnormal_indicators.append( np.array([net_error_cmdb_id])  )
         pass 
     else :
-        # todo step3 找出这段时间内的trace
-        abnormal_traces = find_abnormal_trace(execption_Interval, traces)
         # abnormal_traces trace 中定位到具的体节点，即cmdb_id
         abnormal_cmdb_ids = []
         # todo step4 找出异常数据中的异常节点
@@ -188,7 +208,7 @@ for i in range(len(interval_times)):
             abnormal_cmdb_ids += find_abnormal_span(trace)
         # 去重
         abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
-        print(i+1, abnormal_cmdb_ids)
+        abnormal_cmdb_all.append(abnormal_cmdb_ids)
         # todo step5 判断网元节点中是哪个指标有异常
         for cmdb_id in abnormal_cmdb_ids:
             # ? 找到异常指标
@@ -199,15 +219,22 @@ for i in range(len(interval_times)):
             abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
     result.append(np.array(abnormal_indicators))
 
-# for r in result:
-#     print(r)
+for i in abnormal_cmdb_all:
+    print(i)
 
 # %%
-with open("result", 'w') as f:
+save_path = data_path.get_save_path()
+if not os.path.exists(save_path):
+    os.mkdir(save_path)
+with open(os.path.join(save_path,"result_"+day), 'w') as f:
     for i, r in enumerate(result):
         f.write(str(i+1)+":\n")
         for o in r:
             f.write(str(o)+'\n')
 
+answer = to_standard_answer(result)
+with open(os.path.join(save_path,"answer_"+day), 'w') as f:
+    js = json.dumps(answer, indent=4)
+    f.write(js)
 
 # %%

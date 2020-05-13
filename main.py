@@ -1,53 +1,101 @@
+# %%
 import numpy as np
+import pandas as pd
 import os
 import sys
 import re
+import json
 import matplotlib.pyplot as plt
 import data_path  # 路径
 import data_cleaning
-from read_data import readCSV, read_xlrd
+from read_data import readCSV, read_xlrd, readCsvWithPandas
 from datetime import datetime
 from xlrd import xldate_as_tuple
 from show_Kpis import getKpis
+import anomaly_detection
 kpi_opened = {}
-##是否是执行者调用   
-isExecutor = {"JDBC":False,"LOCAL":False,"CSF":False,"FlyRemote":True,"OSB":True,"RemoteProcess":True}
+left_n = 10  # 保留几个结果
+# 是否是执行者调用
+isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
+              "FlyRemote": True, "OSB": True, "RemoteProcess": True}
+# %%
 
 def main():
-    # 业务指标
-    business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
+    # 结果
+    result,day= [],'2020_04_11'
+    path_prex = data_path.get_data_path(day)
+    business_path = os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv")
     # 调用链指标,平台指标,数据说明
-    trace_p,plat_p,data_instruction_p = data_cleaning.getPath()
-    # 获取业务指标数据，去掉表头
-    data = np.array(readCSV(business_path)[1:])
+    trace_p, plat_p, data_instruction_p = data_cleaning.getPath(day)
+    # 获取业务指标数据，去掉表头,np.array
+    data = readCsvWithPandas(business_path)
+    # 根据时间序列排序
+    data = data[np.argsort(data[:, 1])]
     # todo step1 异常时间序列
-    execption_times = find_time_interval(data)
+    # 异常数据
+    abnormal_data = anomaly_detection.find_abnormal_data(data)
+    # 异常时间序列
+    execption_times = abnormal_data[:, 1].astype(np.int64)
+    #! 异常时间区间
+    interval_times = anomaly_detection.to_interval(execption_times)
+    #! 对应时间区间是否是网络故障
+    is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
+    print(len(interval_times))
+    # 画出找到的异常区间
+    anomaly_detection.draw_abnormal_period(data, interval_times)
 
-    # todo step2 异常时间区间
-    # period_times = to_period_time(execption_times)
-    period_times = fault_time()
-
-    # todo step3 获取所有trace
+    # todo step2 获取所有trace
     traces = data_cleaning.build_trace(trace_p)
 
-    #%%
-    # todo step4 找出这段时间内的trace
-    for i,execption_Interval in enumerate(period_times):
-        # execption_Interval = (0,15865349796310)
-        abnormal_traces = find_abnormal_trace(execption_Interval, traces)
-        # print(len(abnormal_traces))
-        abnormal_cmdb_ids = []
-        # todo step5 找出异常数据中的异常节点
-        for trace in abnormal_traces:
-            #! 以下未实现
-            abnormal_cmdb_ids +=find_abnormal_span(trace)
-        abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
-        print(i+1,abnormal_cmdb_ids)
-        # todo step6 判断该节点是哪个指标有异常
-        # for cmdb_id in abnormal_cmdb_ids:
-        #     # ? 找到异常指标
-        #     abnormal_indicators = find_abnormal_indicators(
-        #         execption_Interval, cmdb_id)
+    # 异常网元列表
+    abnormal_cmdb_all = []
+    #? 遍历每一个时间端
+    for i in range(len(interval_times)):
+        # 异常时间区间
+        execption_Interval = interval_times[i]
+        # 异常指标
+        abnormal_indicators = []
+        # 如果是网络故障
+        is_net_error[i] = False
+        if is_net_error[i]:
+            #do something
+            # net_error_cmdb_id = find_net_cmdb(abnormal_indicators)
+            # abnormal_indicators.append( np.array([net_error_cmdb_id])  )
+            pass 
+        else :
+            # todo step3 找出这段时间内的trace
+            abnormal_traces = find_abnormal_trace(execption_Interval, traces)
+            # abnormal_traces trace 中定位到具的体节点，即cmdb_id
+            abnormal_cmdb_ids = []
+            # todo step4 找出异常数据中的异常节点
+            for trace in abnormal_traces:
+                abnormal_cmdb_ids += find_abnormal_span(trace)
+            # 去重
+            abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
+            abnormal_cmdb_all.append(abnormal_cmdb_ids)
+            # todo step5 判断网元节点中是哪个指标有异常
+            for cmdb_id in abnormal_cmdb_ids:
+                # ? 找到异常指标
+                abnormal_indicators.extend(find_abnormal_indicators(
+                    execption_Interval, cmdb_id))
+            # 对得到的异常指标进行排序
+            abnormal_indicators = sorted(
+                abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
+        result.append(np.array(abnormal_indicators))
+
+    for i in abnormal_cmdb_all:
+        print(i)
+
+    with open("result_"+day, 'w') as f:
+        for i, r in enumerate(result):
+            f.write(str(i+1)+":\n")
+            for o in r:
+                f.write(str(o)+'\n')
+
+    answer = to_standard_answer(result)
+    with open("answer"+day, 'w') as f:
+        js = json.dumps(answer, indent=4)
+        f.write(js)
 
 def find_abnormal_indicators(execption_Interval, cmdb_id):
     """[该时间区间内那个指标错误]
@@ -72,65 +120,81 @@ def find_abnormal_indicators(execption_Interval, cmdb_id):
         temp = k.split(',')  # (cmdb_id,name,bomc_id,itemid)
         if cmdb_id == temp[0]:
             # todo 进行异常评估，给出得分
-            score = anomaly_detection(execption_Interval, v)
-            abnormal_indicators.append((temp[0], temp[1], temp[2], score))
+            score = anomaly_detection_func(execption_Interval, v)
+            abnormal_indicators.append([temp[0], temp[1], temp[2], score])
     # 排序返回得分最高的三个
-    return sorted(abnormal_indicators, key=lambda x: x[3], reversed=True)[:3]
+    return abnormal_indicators
 
 
-def anomaly_detection(execption_Interval, data):
+def anomaly_detection_func(execption_Interval, data):
     """[异常检测算法]
 
     Args:
-        execption_Interval ([tutle]): [时间区间(start-time,end-time)]
-        data ([type]): [description]
+        execption_Interval ([tutle]): [时间区间(start_time,end_time)]
+        data ([type]): [itemid,name,bomc_id,timestamp,valuee,cmdb_id]
     """
-    pass
+    data = pd.DataFrame(data)
+    data.columns = ['itemid', 'name', 'bomc_id',
+                    'timestamp', 'value', 'cmdb_id']
+    # 根据时间戳排序
+    data.sort_values("timestamp", inplace=True)
+    # 得到预测值
+    pred = anomaly_detection.iforest(data, ["value"])
+    timestamps = data['timestamp'].values.astype(np.int64)
+    total, abnormal_data_total = 0, 0
+    for timestamp, pred_num in zip(timestamps, pred):
+        if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
+            total += 1
+            abnormal_data_total += 1 if pred_num == -1 else 0
+
+    return abnormal_data_total
 
 
 def find_abnormal_span(trace):
-    """按照图的遍历方式遍历trace中的所有span
-
+    """按照图的遍历方式遍历trace中的所有span\n
     Args:
         trace ([dict]): 一条trace，格式{ startTime:str,{spanId:{},spanId:{}}}        \n
-
     Returns:
         [list]: 返回异常节点       \n
     """
-    abnormal_spans = []
     spans = trace['spans']
     graph = data_cleaning.generateGraph(spans)
+    if graph.get('root') == None:
+        return []
+
     abnormal_cmdb_ids = []
     Break = True
     # isError代表上溯的节点是否有异常
-    def traverse(root_id,abn_ids,isError=False):
+
+    def traverse(root_id, abn_ids, isError=False):
         root = spans[root_id]
-        # if isExecutor[root['callType']] and root['callType']!='OSB' and \
-        #     float(root['duration'])>1000:
-        #     abn_ids.append(root["cmdb_id"])
         # 如果上溯有异常或本身有异常
         if isError or root['success'] == 'False':
-            if isExecutor[root['callType']] and root['callType']!='OSB':
-                abn_ids.append(root["cmdb_id"])
             # 当发现是数据库出现问题时，将其他的清空，只保存数据库cmdb_id,并退出递归
             if root['db'] and root['success'] == 'False':
                 abn_ids.clear()
                 abn_ids.append(root["db"])
                 return Break
-            isError = True
+            # 找出上一个失败的下一个成功
+            if isExecutor[root['callType']] and root['callType'] != 'OSB' \
+                    and root['success'] == 'True':
+                abn_ids.clear()
+                abn_ids.append(root["cmdb_id"])
+        isError = root['success'] == 'False'
         # 如果没有子节点，直接返回
         if graph.get(root_id) == None:
             return not Break
         for span_id in graph[root_id]:
-            if traverse(span_id,abn_ids,isError)==Break:
+            if traverse(span_id, abn_ids, isError) == Break:
                 return Break
         return not Break
 
-    for root_id in graph['root']:
+    for span_id in graph.get('root'):
         abn_ids = []
-        traverse(root_id,abn_ids)
+        traverse(span_id, abn_ids)
         abnormal_cmdb_ids += abn_ids
-    return list(set(abnormal_cmdb_ids))
+    return abnormal_cmdb_ids
+
 
 def find_abnormal_trace(execption_Interval, traces):
     """找到改异常区间内所有trace
@@ -146,69 +210,25 @@ def find_abnormal_trace(execption_Interval, traces):
             abnormal_trace.append(trace)
     return abnormal_trace
 
-
-def fault_time(bias=0):
-    table = read_xlrd(os.path.join(
-        data_path.get_data_path(), "数据说明", "0故障内容.xlsx"))
-    table_head = table.row_values(0)
-    time_index, duration_index = 0, 0
-    for i in range(table.ncols):
-        if table_head[i] == 'time':
-            time_index = i
-        elif table_head[i] == 'duration':
-            duration_index = i
-    res = []
-    for i in range(1, table.nrows):
-        row = table.row_values(i)
-        cell = table.cell_value(i, time_index)
-        date = datetime(*xldate_as_tuple(cell, 0))
-        # print(date)
-        time_stamp = int(datetime.timestamp(date))*1000
-        duration = int(re.match('\d*', row[duration_index])[0])*60*1000
-        res.append((time_stamp, time_stamp+duration))
-    return res
-
-
-def find_time_interval(data):
-    """
-    在入口服务中，找到异常的数据的时间戳
-    """
-    avg_times = data[:, 2].astype(np.float32)
-    succee_rate = data[:, 5].astype(np.float32)
-    std = np.std(avg_times, ddof=1)
-    means = np.mean(avg_times)
-    high = means+3*std
-    # low = means-3*std
-    def lam(i): return avg_times[i] > high or succee_rate[i] < 1
-    res = data[list(filter(lam,  range(len(data))))]
-    return res[:, 1].astype(np.int64)
-
-
-def to_period_time(timestamps, bias=5*1000):
-    '''
-    将时间戳的序列转换为时间段
-    '''
-    r = list(map(lambda t: (t-bias, t+bias), timestamps))
-    return r
-
-
-def draw(data):
-    x = range(len(data))
-    plt.figure(figsize=(8, 5))
-    # 获取平均处理时间一列
-    y = data[:, 2].astype(np.float32)
-    plt.subplot(2, 1, 1)
-    # plt.title("平均调用时间")
-    plt.plot(x, y, label="平均调用时间")
-
-    # 获取成功率一列
-    y = data[:, 5].astype(np.float32)
-    plt.subplot(2, 1, 2)
-    # plt.title("成功率")
-    plt.plot(x, y, color='r', label="成功率")
-
-    plt.show()
+def to_standard_answer(result):
+    answer = {}
+    # 异常时间段
+    for i,a_result in enumerate(result):
+        if len(a_result)==0:
+            continue
+        cmdb = a_result[-1][0].split("_")[0] # docker
+        answer[str(i+1)]=[ cmdb, a_result[-1][0] ] # docker_001
+        if len(a_result)==1:
+            continue
+        # 每一个异常时间段有多个指标
+        indicator_list = [an_indicator[1] for an_indicator in a_result]
+        answer[str(i+1)].append(indicator_list)
+    return answer
 
 
 if __name__ == '__main__':
     main()
+
+
+
+

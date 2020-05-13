@@ -49,7 +49,10 @@ for k,v in res.items():
 #print(res)
 json_str = json.dumps(avg_res,indent=4)
 # print(json_str)
-with open("count.json",'w')as f:
+save_path = data_path.get_save_path()
+if not os.path.exists(save_path):
+    os.mkdir(save_path)
+with open(os.path.join(save_path,"count.json"),'w')as f:
     f.write(json_str)
         
 

@@ -8,14 +8,14 @@ from tqdm import tqdm
 import time
 import data_path 
 from read_data import readCSV
-def getPath():
+def getPath(day=None):
     '''
     return (p1,p2,p3) (调用链指标,平台指标,数据说明)
     '''
-    prex_path_all = data_path.get_data_path()
-    p1 = os.path.join(prex_path_all,"调用链指标")
-    p2 = os.path.join(prex_path_all,"平台指标")
-    p3 = os.path.join(prex_path_all,"数据说明")
+    prex_path = data_path.get_data_path() if not day else data_path.get_data_path(day)
+    p1 = os.path.join(prex_path,"调用链指标")
+    p2 = os.path.join(prex_path,"平台指标")
+    p3 = os.path.join(prex_path,"数据说明")
     return p1,p2,p3
 
 path, path2, path3 = getPath() #路径
