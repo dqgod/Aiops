@@ -13,13 +13,14 @@ from datetime import datetime
 from xlrd import xldate_as_tuple
 from show_Kpis import getKpis
 import anomaly_detection
+import network
 kpi_opened = {}
 left_n = 10  # 保留几个结果
 # 是否是执行者调用
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_22'
+day = '2020_04_11'
 # %%
 
 
@@ -145,15 +146,16 @@ def to_standard_answer(result):
         cmdb = a_result[-1][0].split("_")[0] # docker
         answer[str(i+1)]=[ cmdb, a_result[-1][0] ] # docker_001
         if len(a_result)==1:
-            continue
+            answer[str(i+1)].append([None])
+        else:
         # 每一个异常时间段有多个指标
-        indicator_list = [an_indicator[1] for an_indicator in a_result]
-        answer[str(i+1)].append(indicator_list)
+            indicator_list = [an_indicator[1] for an_indicator in a_result]
+            answer[str(i+1)].append(indicator_list)
     return answer
 
 # %%
 # 结果
-result = []
+
 path_prex = data_path.get_data_path(day)
 
 business_path = os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv")
@@ -185,6 +187,7 @@ traces = data_cleaning.build_trace(trace_p)
 
 # %%
 abnormal_cmdb_all = []
+result = [ 0 for _ in range(len(interval_times))]
 #? 遍历每一个时间端
 for i in range(len(interval_times)):
     # 异常时间区间
@@ -194,12 +197,13 @@ for i in range(len(interval_times)):
     # todo step3 找出这段时间内的trace
     abnormal_traces = find_abnormal_trace(execption_Interval, traces)
     # 如果是网络故障
-    is_net_error[i] = False
+    # is_net_error[i] = False
+    print(is_net_error[i])
     if is_net_error[i]:
         #do something
-        # net_error_cmdb_id = find_net_cmdb(abnormal_indicators)
-        # abnormal_indicators.append( np.array([net_error_cmdb_id])  )
-        pass 
+        net_error_cmdb_id = network.locate_net_error(abnormal_traces)
+        abnormal_cmdb_all.append(net_error_cmdb_id)
+        abnormal_indicators.append( net_error_cmdb_id )
     else :
         # abnormal_traces trace 中定位到具的体节点，即cmdb_id
         abnormal_cmdb_ids = []
@@ -217,12 +221,15 @@ for i in range(len(interval_times)):
         # 对得到的异常指标进行排序
         abnormal_indicators = sorted(
             abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
-    result.append(np.array(abnormal_indicators))
+    result[i] = np.array(abnormal_indicators)
 
 for i in abnormal_cmdb_all:
     print(i)
 
 # %%
+print(len(result))
+# for i in result:
+#     print(i)
 save_path = data_path.get_save_path()
 if not os.path.exists(save_path):
     os.mkdir(save_path)
@@ -238,3 +245,4 @@ with open(os.path.join(save_path,"answer_"+day), 'w') as f:
     f.write(js)
 
 # %%
+
