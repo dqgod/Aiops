@@ -1,5 +1,7 @@
 # %%
 import numpy as np
+
+sys.path.append('../')
 import pandas as pd
 import os
 import sys
@@ -20,7 +22,7 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_22'
+day = '2020_04_11'
 # %%
 
 
@@ -220,6 +222,8 @@ for i in range(len(interval_times)):
         # 对得到的异常指标进行排序
         abnormal_indicators = sorted(
             abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
+        if int(abnormal_indicators[0][-1])==0:
+            abnormal_indicators.clear()
     result[i] = np.array(abnormal_indicators)
 
 for i in abnormal_cmdb_all:
