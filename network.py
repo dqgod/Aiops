@@ -89,7 +89,7 @@ def locate_net_error(traces):
     for abnormal_call in abnormal_calls:
         caller=abnormal_call.split("->")[0]
         Executor=abnormal_call.split("->")[1]
-        if caller!=Executor
+        if caller!=Executor:
             abnormal_amdbs.append(Executor)
     return abnormal_amdbs
 
