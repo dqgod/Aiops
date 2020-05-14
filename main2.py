@@ -1,7 +1,5 @@
 # %%
 import numpy as np
-
-sys.path.append('../')
 import pandas as pd
 import os
 import sys
@@ -145,42 +143,43 @@ def to_standard_answer(result):
         if len(a_result)==0:
             continue
         cmdb = a_result[-1][0].split("_")[0] # docker
-        answer[str(i+1)]=[ cmdb, a_result[-1][0] ] # docker_001
+        answer[str(i+1)]=[ cmdb, a_result[0][0] ] # docker_001
         if len(a_result)==1:
+            answer[str(i+1)].extend(a_result[0][1:])
             answer[str(i+1)].append([None])
         else:
         # 每一个异常时间段有多个指标
             indicator_list = [an_indicator[1] for an_indicator in a_result]
             answer[str(i+1)].append(indicator_list)
     return answer
+def get_abnormal_interval(path_prex):
+    business_path = os.path.join(path_prex, "业务指标", "esb.csv")
+    # 获取业务指标数据，去掉表头,np.array
+    data = pd.read_csv(business_path).values
+    # 根据时间序列排序
+    data = data[np.argsort(data[:, 1])]
+    # todo step1 异常时间序列
+    # 异常数据
+    abnormal_data = anomaly_detection.find_abnormal_data(data)
+    # 异常时间序列
+    execption_times = abnormal_data[:, 1].astype(np.int64)
+    #! 异常时间区间
+    interval_times = anomaly_detection.to_interval(execption_times)
+    #! 对应时间区间是否是网络故障
+    is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
+    print(len(interval_times))
+    # period_times = anomaly_detection.fault_time()
+    # for i,j in zip(interval_times,is_net_error):
+    #     print(i,j)
+    # 画出找到的异常区间
+    anomaly_detection.draw_abnormal_period(data, interval_times)
 
+    return interval_times,is_net_error
 # %%
-# 结果
-
-path_prex = data_path.get_data_path(day)
-
-business_path = os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv")
 # 调用链指标,平台指标,数据说明
 trace_p, plat_p, data_instruction_p = data_cleaning.getPath(day)
-# 获取业务指标数据，去掉表头,np.array
-data = readCsvWithPandas(business_path)
-# 根据时间序列排序
-data = data[np.argsort(data[:, 1])]
-# todo step1 异常时间序列
-# 异常数据
-abnormal_data = anomaly_detection.find_abnormal_data(data)
-# 异常时间序列
-execption_times = abnormal_data[:, 1].astype(np.int64)
-#! 异常时间区间
-interval_times = anomaly_detection.to_interval(execption_times)
-#! 对应时间区间是否是网络故障
-is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
-print(len(interval_times))
-# period_times = anomaly_detection.fault_time()
-# for i,j in zip(interval_times,is_net_error):
-#     print(i,j)
-# 画出找到的异常区间
-anomaly_detection.draw_abnormal_period(data, interval_times)
+path_prex = data_path.get_data_path(day)
+interval_times,is_net_error = get_abnormal_interval(path_prex)
 
 # %%
 # todo step2 获取所有trace
@@ -188,6 +187,7 @@ traces = data_cleaning.build_trace(trace_p)
 
 # %%
 abnormal_cmdb_all = []
+# 结果
 result = [ 0 for _ in range(len(interval_times))]
 #? 遍历每一个时间端
 for i in range(len(interval_times)):
@@ -223,7 +223,7 @@ for i in range(len(interval_times)):
         abnormal_indicators = sorted(
             abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
         if int(abnormal_indicators[0][-1])==0:
-            abnormal_indicators.clear()
+            abnormal_indicators = [abnormal_cmdb_ids]
     result[i] = np.array(abnormal_indicators)
 
 for i in abnormal_cmdb_all:

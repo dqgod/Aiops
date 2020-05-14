@@ -5,8 +5,10 @@ import os
 from data_path import get_data_path
 from sklearn.ensemble import IsolationForest
 import show_Kpis 
+import anomaly_detection
 # %%读取所有Kpis
-path = os.path.join(get_data_path(), "平台指标")
+day = '2020_04_22'
+path = os.path.join(get_data_path(day), "平台指标")
 kpis = show_Kpis.getKpis(["dcos_docker.csv"], path)
 print("Get ALL KPIS")
 
@@ -61,5 +63,28 @@ for i in range(shape//batch+1):
     all_pred.extend(pred)
 
 data['pred'] = all_pred
-data.to_csv('outliers.csv', columns=["pred", ], header=False)
+data.to_csv('outliers.csv', columns=["timestamp","pred", ], header=False)
 
+# %%
+business_path = os.path.join(get_data_path(day), "业务指标", "esb.csv")
+# 获取业务指标数据，去掉表头,np.array
+data = pd.read_csv(business_path).values
+# 根据时间序列排序
+data = data[np.argsort(data[:, 1])]
+# todo step1 异常时间序列
+# 异常数据
+abnormal_data = anomaly_detection.find_abnormal_data(data)
+# 异常时间序列
+execption_times = abnormal_data[:, 1].astype(np.int64)
+#! 异常时间区间
+interval_times = anomaly_detection.to_interval(execption_times)
+#! 对应时间区间是否是网络故障
+is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
+print(len(interval_times))
+# period_times = anomaly_detection.fault_time()
+for i,j in zip(interval_times,is_net_error):
+    print(i,j)
+# 画出找到的异常区间
+anomaly_detection.draw_abnormal_period(data, interval_times)
+
+# %%
