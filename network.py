@@ -82,7 +82,7 @@ def locate_net_error(traces):
     for key,value in avg_res.items():
         normal_value=normal[key]
         #print(str(normal_value)+"  "+str(value))
-        if value>3*normal_value:
+        if value>6*normal_value:
             abnormal_calls.append(key)
     # print(abnormal_calls)
     abnormal_amdbs=[]

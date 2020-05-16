@@ -14,7 +14,7 @@ def timeStamp_to_datetime(timeStamp):
     return  datetime
 if __name__ == '__main__':
     #timeStamp=[1586535484617,1586535484750]
-    path=data_path.get_data_path()
+    path=data_path.get_data_path("2020_04_22")
     path=os.path.join(path,"调用链指标")
     files=os.listdir(path)
     #files=["trace_fly_remote.csv"]

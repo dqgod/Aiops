@@ -14,6 +14,8 @@ from xlrd import xldate_as_tuple
 from show_Kpis import getKpis
 import anomaly_detection
 import network
+import resultForm
+#%%
 kpi_opened = {}
 left_n = 10  # 保留几个结果
 # 是否是执行者调用
@@ -236,16 +238,19 @@ print(len(result))
 save_path = data_path.get_save_path()
 if not os.path.exists(save_path):
     os.mkdir(save_path)
-with open(os.path.join(save_path,"result_"+day), 'w') as f:
-    for i, r in enumerate(result):
-        f.write(str(i+1)+":\n")
-        for o in r:
-            f.write(str(o)+'\n')
+# with open(os.path.join(save_path,"result_"+day), 'w') as f:
+#     for i, r in enumerate(result):
+#         f.write(str(i+1)+":\n")
+#         for o in r:
+#             f.write(str(o)+'\n')
+resultForm.resultForm(result)
 
-answer = to_standard_answer(result)
-with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
-    js = json.dumps(answer, indent=4)
-    f.write(js)
+
+
+# answer = to_standard_answer(result)
+# with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
+#     js = json.dumps(answer, indent=4)
+#     f.write(js)
 
 # %%
 
