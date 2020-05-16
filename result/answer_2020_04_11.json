@@ -3,8 +3,8 @@
         "docker",
         "docker_003",
         [
-            "container_cpu_used",
             "container_mem_used",
+            "container_cpu_used",
             "container_session_used",
             "container_fgc",
             "container_thread_used_pct",
@@ -54,9 +54,9 @@
             "Session_pct",
             "Exec_Per_Sec",
             "Proc_User_Used_Pct",
-            "DbTime",
-            "Logic_Read_Per_Sec",
-            "TPS_Per_Sec"
+            "TPS_Per_Sec",
+            "Proc_Used_Pct",
+            "Sess_Active"
         ]
     ],
     "6": [
@@ -81,9 +81,28 @@
             null
         ]
     ],
+    "8": [
+        "docker",
+        "docker_003",
+        [
+            null
+        ]
+    ],
     "9": [
         "docker",
         "docker_002",
+        "docker_008",
+        "docker_008",
+        "docker_001",
+        "docker_008",
+        [
+            null
+        ]
+    ],
+    "10": [
+        "docker",
+        "docker_001",
+        "docker_007",
         [
             null
         ]
@@ -92,16 +111,16 @@
         "db",
         "db_003",
         [
-            "Sess_Connect",
             "MEM_Used",
-            "Login_Per_Sec",
             "MEM_real_util",
             "MEM_Used_Pct",
+            "Sess_Connect",
+            "Login_Per_Sec",
             "tnsping_result_time",
             "Proc_User_Used_Pct",
             "Proc_Used_Pct",
             "PGA_used_total",
-            "On_Off_State"
+            "Exec_Per_Sec"
         ]
     ]
 }

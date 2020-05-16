@@ -39,7 +39,7 @@ def find_abnormal_data(data):
     return res
 
 
-def to_interval(timestamps, bias=1.5*60*1000):
+def to_interval(timestamps, bias=3*60*1000):
     '''
     将时间戳的序列转换为时间段,区间合并
     '''
@@ -70,14 +70,13 @@ def is_net_error_func(intervals,abnormal_data):
         total, succee_rate_equal_one = 0, 0
         start,end = interval[0],interval[1]
         for timestamp, succee_rate in zip(timestamps,succee_rates):
-            if timestamp >= end:
-                break
-            if timestamp > start:
+            if timestamp > start and timestamp < end:
                 succee_rate_equal_one += 1 if float(succee_rate)>=1 else 0
                 total += 1
         # print(total, succee_rate_equal_one)
         succee_rate_not_equal_one = total-succee_rate_equal_one
-        is_net_error.append(succee_rate_equal_one/total > 0.9)
+        print(succee_rate_equal_one,total,succee_rate_equal_one/total)
+        is_net_error.append(succee_rate_equal_one/total > 0.8)
     return is_net_error
 
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
