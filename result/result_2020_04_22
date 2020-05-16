@@ -1,21 +1,34 @@
 1:
+<<<<<<< HEAD
 ['docker_004']
 2:
 ['db_003']
+=======
+2:
+>>>>>>> ef2511cd9a340f6677289479076658ad1db6d316
 3:
 ['docker_006' 'docker_005' 'docker_003']
 4:
 []
 5:
 6:
+<<<<<<< HEAD
 ['os_021' 'docker_003' 'docker_006' 'docker_004' 'docker_006']
+=======
+['docker_006' 'docker_006']
+>>>>>>> ef2511cd9a340f6677289479076658ad1db6d316
 7:
 ['os_021' 'docker_004' 'docker_003']
 8:
 ['docker_001']
 9:
+<<<<<<< HEAD
 ['docker_003' 'docker_006' 'docker_006' 'docker_004' 'docker_006']
 10:
 ['docker_004' 'docker_005' 'docker_003' 'docker_005']
+=======
+['docker_006' 'docker_006']
+10:
+>>>>>>> ef2511cd9a340f6677289479076658ad1db6d316
 11:
-['docker_001' 'docker_007' 'docker_002' 'docker_007']
+['docker_007' 'docker_007']
