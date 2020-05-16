@@ -1,9 +1,9 @@
 import data_path
 import os
 import csv
-def resultForm(result):
+def resultForm(result,filename):
     header=['fault_id','rank','category','cmdb_id','index']
-    with open(os.path.join(data_path.get_save_path(), "resultForm.csv"), 'w') as f:
+    with open(os.path.join(data_path.get_save_path(), filename+"resultForm.csv"), 'w') as f:
         writer=csv.writer(f)
         writer.writerow(header)
         for i, r in enumerate(result):

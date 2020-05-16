@@ -243,7 +243,7 @@ if not os.path.exists(save_path):
 #         f.write(str(i+1)+":\n")
 #         for o in r:
 #             f.write(str(o)+'\n')
-resultForm.resultForm(result)
+resultForm.resultForm(result,"result_"+day)
 
 
 
