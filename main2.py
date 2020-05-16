@@ -22,7 +22,7 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_11'
+day = '2020_04_22'
 # %%
 
 
@@ -142,9 +142,9 @@ def to_standard_answer(result):
     answer = {}
     # 异常时间段
     for i,a_result in enumerate(result):
-        if len(a_result)==0:
+        if len(a_result)==0 or (len(a_result)==1 and len(a_result[0])==0):
             continue
-        cmdb = a_result[-1][0].split("_")[0] # docker
+        cmdb = a_result[0][0].split("_")[0] # docker
         answer[str(i+1)]=[ cmdb, a_result[0][0] ] # docker_001
         if len(a_result)==1:
             answer[str(i+1)].extend(a_result[0][1:])
@@ -224,7 +224,7 @@ for i in range(len(interval_times)):
         # 对得到的异常指标进行排序
         abnormal_indicators = sorted(
             abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
-        if int(abnormal_indicators[0][-1])==0:
+        if len(abnormal_indicators) !=0 and int(abnormal_indicators[0][-1])==0:
             abnormal_indicators = [abnormal_cmdb_ids]
     result[i] = np.array(abnormal_indicators)
 
@@ -232,6 +232,8 @@ for i in abnormal_cmdb_all:
     print(i)
 
 # %%
+import importlib
+importlib.reload(resultForm)
 print(len(result))
 # for i in result:
 #     print(i)

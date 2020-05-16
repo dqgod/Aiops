@@ -1,10 +1,30 @@
-<<<<<<< HEAD
-{}
-=======
 {
+    "1": [
+        "docker",
+        "docker_004",
+        [
+            null
+        ]
+    ],
+    "2": [
+        "db",
+        "db_003",
+        [
+            null
+        ]
+    ],
     "6": [
         "docker",
         "docker_006",
+        "docker_006",
+        [
+            null
+        ]
+    ],
+    "7": [
+        "docker",
+        "docker_004",
+        "docker_003",
         [
             null
         ]
@@ -19,6 +39,15 @@
     "9": [
         "docker",
         "docker_006",
+        "docker_006",
+        [
+            null
+        ]
+    ],
+    "10": [
+        "docker",
+        "docker_005",
+        "docker_005",
         [
             null
         ]
@@ -26,9 +55,9 @@
     "11": [
         "docker",
         "docker_007",
+        "docker_007",
         [
             null
         ]
     ]
 }
->>>>>>> ef2511cd9a340f6677289479076658ad1db6d316
