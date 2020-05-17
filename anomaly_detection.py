@@ -58,7 +58,7 @@ def to_interval(timestamps, bias=3*60*1000):
     r = list(map(lambda t: [t-bias, t+bias], timestamps))
     return merge(r)
 
-def is_net_error_func(intervals,abnormal_data):
+def is_net_error_func(intervals,abnormal_data, n=0.9):
     '''
     abnormal_data: [serviceName,startTime,avg_time,num,succee_num,succee_rate]，异常数据
     '''
@@ -75,8 +75,8 @@ def is_net_error_func(intervals,abnormal_data):
                 total += 1
         # print(total, succee_rate_equal_one)
         succee_rate_not_equal_one = total-succee_rate_equal_one
-        print(succee_rate_equal_one,total,succee_rate_equal_one/total)
-        is_net_error.append(succee_rate_equal_one/total > 0.8)
+        # print(succee_rate_equal_one,total,succee_rate_equal_one/total)
+        is_net_error.append(succee_rate_equal_one/total > n)
     return is_net_error
 
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):

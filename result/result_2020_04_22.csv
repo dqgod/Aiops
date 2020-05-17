@@ -1,9 +1,13 @@
 fault_id,rank,category,cmdb_id,index
-1,0,docker,docker_004,
-2,0,db,db_003,
+1,0,docker,docker_004,container_cpu_used
+1,1,docker,docker_004,container_mem_used
+2,0,db,db_003,MEM_Used
+2,1,db,db_003,MEM_Used_Pct
+3,0,docker,docker_005,
+4,0,docker,docker_003,
 6,0,docker,docker_006,
-7,0,docker,docker_004,
 8,0,docker,docker_001,
 9,0,docker,docker_006,
-10,0,docker,docker_005,
+10,0,docker,docker_005,container_cpu_used
+10,1,docker,docker_003,container_cpu_used
 11,0,docker,docker_007,

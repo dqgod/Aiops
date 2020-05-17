@@ -1,6 +1,7 @@
 # %%
 import numpy as np
 import pandas as pd
+import importlib
 import os
 import sys
 import re
@@ -26,7 +27,7 @@ day = '2020_04_22'
 # %%
 
 
-def find_abnormal_indicators(execption_Interval, cmdb_id):
+def find_abnormal_indicators(execption_Interval, cmdb_id,path):
     """[该时间区间内那个指标错误]
 
     Args:
@@ -40,7 +41,7 @@ def find_abnormal_indicators(execption_Interval, cmdb_id):
     # file_path = os.path.join(data_path.get_data_path(),"平台指标",file_name)
     # 查看当前文件是否已经分解
     if kpi_opened.get(file_name) == None:
-        kpis = getKpis([file_name])
+        kpis = getKpis([file_name],path)
         kpi_opened[file_name] = kpis
     else:
         kpis = kpi_opened[file_name]
@@ -49,7 +50,7 @@ def find_abnormal_indicators(execption_Interval, cmdb_id):
         temp = k.split(',')  # (cmdb_id,name,bomc_id,itemid)
         if cmdb_id == temp[0]:
             # todo 进行异常评估，给出得分
-            score = anomaly_detection_func(execption_Interval, v)
+            score = anomaly_detection_func(execption_Interval, np.array(v))
             abnormal_indicators.append([temp[0], temp[1], temp[2], score])
     # 排序返回得分最高的三个
     return abnormal_indicators
@@ -69,6 +70,8 @@ def anomaly_detection_func(execption_Interval, data):
     data.sort_values("timestamp", inplace=True)
     # 得到预测值
     pred = anomaly_detection.iforest(data, ["value"])
+    data['pred'] = pred
+    # data.to_csv('outliers2.csv', columns=["timestamp",'value',"pred", ], header=False)
     timestamps = data['timestamp'].values.astype(np.int64)
     total, abnormal_data_total = 0, 0
     for timestamp, pred_num in zip(timestamps, pred):
@@ -104,11 +107,12 @@ def find_abnormal_span(trace):
                 abn_ids.append(root["db"])
                 return Break
             # 找出上一个失败的下一个成功
-            if isExecutor[root['callType']] and root['callType'] != 'OSB' \
-                    and root['success'] == 'True':
-                abn_ids.clear()
+            if isExecutor[root['callType']] and root['callType'] != 'OSB' :
+                    # and root['success'] == 'True':
+                # abn_ids.clear()
                 abn_ids.append(root["cmdb_id"])
-        isError = root['success'] == 'False'
+            isError = True
+        # isError = root['success'] == 'False'
         # 如果没有子节点，直接返回
         if graph.get(root_id) == None:
             return not Break
@@ -171,14 +175,15 @@ def get_abnormal_interval(path_prex):
     is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
     print(len(interval_times))
     # period_times = anomaly_detection.fault_time()
-    # for i,j in zip(interval_times,is_net_error):
-    #     print(i,j)
+    for i,j in zip(interval_times,is_net_error):
+        print(i,j)
     # 画出找到的异常区间
     anomaly_detection.draw_abnormal_period(data, interval_times)
 
     return interval_times,is_net_error
 # %%
 # 调用链指标,平台指标,数据说明
+importlib.reload(anomaly_detection)
 trace_p, plat_p, data_instruction_p = data_cleaning.getPath(day)
 path_prex = data_path.get_data_path(day)
 interval_times,is_net_error = get_abnormal_interval(path_prex)
@@ -218,9 +223,10 @@ for i in range(len(interval_times)):
         abnormal_cmdb_all.append(abnormal_cmdb_ids)
         # todo step5 判断网元节点中是哪个指标有异常
         for cmdb_id in abnormal_cmdb_ids:
-            # ? 找到异常指标
+            # ? 找到异常指标c 
             abnormal_indicators.extend(find_abnormal_indicators(
-                execption_Interval, cmdb_id))
+                execption_Interval, cmdb_id,plat_p))
+            print(execption_Interval, cmdb_id)
         # 对得到的异常指标进行排序
         abnormal_indicators = sorted(
             abnormal_indicators, key=lambda x: x[-1], reverse=True)[:left_n]
@@ -228,30 +234,31 @@ for i in range(len(interval_times)):
             abnormal_indicators = [abnormal_cmdb_ids]
     result[i] = np.array(abnormal_indicators)
 
+
 for i in abnormal_cmdb_all:
     print(i)
 
 # %%
-import importlib
-importlib.reload(resultForm)
+
+
 print(len(result))
 # for i in result:
 #     print(i)
 save_path = data_path.get_save_path()
 if not os.path.exists(save_path):
     os.mkdir(save_path)
-# with open(os.path.join(save_path,"result_"+day), 'w') as f:
-#     for i, r in enumerate(result):
-#         f.write(str(i+1)+":\n")
-#         for o in r:
-#             f.write(str(o)+'\n')
+with open(os.path.join(save_path,"result_"+day), 'w') as f:
+    for i, r in enumerate(result):
+        f.write(str(i+1)+":\n")
+        for o in r:
+            f.write(str(o)+'\n')
 resultForm.resultForm(result,"result_"+day)
 
 
 
 answer = to_standard_answer(result)
 with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
-    js = json.dumps(answer, indent=4)
+    js = json.dumps(answer, indent=2)
     f.write(js)
 
 # %%

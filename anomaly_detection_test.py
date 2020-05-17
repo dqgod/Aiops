@@ -27,7 +27,7 @@ def get_specific_kpi(kpis, filter_list):
             res.append((k, np.array(v)))
     return res
 
-filter_list = ["docker_003", "cpu"]
+filter_list = ["docker_004", "cpu"]
 data = get_specific_kpi(kpis, filter_list)[-1][1]
 show_Kpis.showKpiCurve(kpis, filter_list)
 #%% 排序并转换为dataframe
@@ -63,7 +63,7 @@ for i in range(shape//batch+1):
     all_pred.extend(pred)
 
 data['pred'] = all_pred
-data.to_csv('outliers.csv', columns=["timestamp","pred", ], header=False)
+data.to_csv('outliers1.csv', columns=["timestamp",'value',"pred", ], header=False)
 
 # %%
 business_path = os.path.join(get_data_path(day), "业务指标", "esb.csv")

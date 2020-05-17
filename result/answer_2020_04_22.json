@@ -1,63 +1,96 @@
 {
-    "1": [
-        "docker",
-        "docker_004",
-        [
-            null
-        ]
-    ],
-    "2": [
-        "db",
-        "db_003",
-        [
-            null
-        ]
-    ],
-    "6": [
-        "docker",
-        "docker_006",
-        "docker_006",
-        [
-            null
-        ]
-    ],
-    "7": [
-        "docker",
-        "docker_004",
-        "docker_003",
-        [
-            null
-        ]
-    ],
-    "8": [
-        "docker",
-        "docker_001",
-        [
-            null
-        ]
-    ],
-    "9": [
-        "docker",
-        "docker_006",
-        "docker_006",
-        [
-            null
-        ]
-    ],
-    "10": [
-        "docker",
-        "docker_005",
-        "docker_005",
-        [
-            null
-        ]
-    ],
-    "11": [
-        "docker",
-        "docker_007",
-        "docker_007",
-        [
-            null
-        ]
+  "1": [
+    "docker",
+    "docker_004",
+    [
+      "container_cpu_used",
+      "container_mem_used",
+      "container_thread_idle",
+      "container_thread_running",
+      "container_thread_used_pct",
+      "container_session_used",
+      "container_fgc",
+      "container_thread_total",
+      "container_fgct"
     ]
+  ],
+  "2": [
+    "db",
+    "db_003",
+    [
+      "MEM_Used",
+      "MEM_Used_Pct",
+      "Login_Per_Sec",
+      "Proc_User_Used_Pct",
+      "TPS_Per_Sec",
+      "MEM_real_util",
+      "Proc_Used_Pct",
+      "Sess_Connect",
+      "Logic_Read_Per_Sec",
+      "Session_pct"
+    ]
+  ],
+  "3": [
+    "docker",
+    "docker_005",
+    "docker_003",
+    "docker_006",
+    [
+      null
+    ]
+  ],
+  "4": [
+    "docker",
+    "docker_003",
+    [
+      null
+    ]
+  ],
+  "6": [
+    "docker",
+    "docker_006",
+    "docker_006",
+    [
+      null
+    ]
+  ],
+  "8": [
+    "docker",
+    "docker_001",
+    [
+      null
+    ]
+  ],
+  "9": [
+    "docker",
+    "docker_006",
+    "docker_006",
+    [
+      null
+    ]
+  ],
+  "10": [
+    "docker",
+    "docker_005",
+    [
+      "container_cpu_used",
+      "container_cpu_used",
+      "container_thread_idle",
+      "container_thread_running",
+      "container_thread_total",
+      "container_mem_used",
+      "container_fgct",
+      "container_session_used",
+      "container_fgc",
+      "container_thread_used_pct"
+    ]
+  ],
+  "11": [
+    "docker",
+    "docker_007",
+    "docker_007",
+    [
+      null
+    ]
+  ]
 }
