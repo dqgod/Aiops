@@ -107,12 +107,12 @@ def find_abnormal_span(trace):
                 abn_ids.append(root["db"])
                 return Break
             # 找出上一个失败的下一个成功
-            if isExecutor[root['callType']] and root['callType'] != 'OSB' :
-                    # and root['success'] == 'True':
-                # abn_ids.clear()
+            if isExecutor[root['callType']] and root['callType'] != 'OSB' \
+                    and root['success'] == 'True':
+                abn_ids.clear()
                 abn_ids.append(root["cmdb_id"])
-            isError = True
-        # isError = root['success'] == 'False'
+            # isError = True
+        isError = root['success'] == 'False'
         # 如果没有子节点，直接返回
         if graph.get(root_id) == None:
             return not Break
@@ -215,13 +215,13 @@ for i in range(len(interval_times)):
         abnormal_indicators.append( net_error_cmdb_id )
     else :
         # abnormal_traces trace 中定位到具的体节点，即cmdb_id
-        abnormal_cmdb_ids = []
-        # todo step4 找出异常数据中的异常节点
-        # for trace in abnormal_traces:
-        #     abnormal_cmdb_ids += find_abnormal_span(trace)
-        # 去重
-        # abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
         abnormal_cmdb_ids = list(set(network.locate_net_error(abnormal_traces)))
+        # todo step4 找出异常数据中的异常节点
+        for trace in abnormal_traces:
+            abnormal_cmdb_ids += find_abnormal_span(trace)
+        # 去重
+        abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
+        
         abnormal_cmdb_all.append(abnormal_cmdb_ids)
         # todo step5 判断网元节点中是哪个指标有异常
         for cmdb_id in abnormal_cmdb_ids:
