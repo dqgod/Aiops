@@ -170,11 +170,12 @@ def get_abnormal_interval(path_prex):
     # 异常时间序列
     execption_times = abnormal_data[:, 1].astype(np.int64)
     #! 异常时间区间
-    interval_times = anomaly_detection.to_interval(execption_times)
+    # interval_times = anomaly_detection.to_interval(execption_times)
+    interval_times = anomaly_detection.fault_time(bias=5*60*100,file_day=day)
     #! 对应时间区间是否是网络故障
     is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
     print(len(interval_times))
-    # period_times = anomaly_detection.fault_time()
+    period_times = anomaly_detection.fault_time()
     for i,j in zip(interval_times,is_net_error):
         print(i,j)
     # 画出找到的异常区间

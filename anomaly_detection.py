@@ -103,19 +103,20 @@ def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     # data.to_csv('outliers.csv', columns=["pred", ], header=False)
     return np.array(all_pred)
     
-def fault_time(bias=0):
+def fault_time(bias=0,file_day="2020_04_11"):
     """[summary]
     直接读文件读出 故障时间
     """
     table = read_xlrd(os.path.join(
-        data_path.get_data_path(), "数据说明", "0故障内容.xlsx"))
+        data_path.get_data_path(file_day), "数据说明", "0故障说明.xlsx"))
     table_head = table.row_values(0)
     time_index, duration_index = 0, 0
     for i in range(table.ncols):
-        if table_head[i] == 'time':
+        if 'time' in table_head[i] :
             time_index = i
         elif table_head[i] == 'duration':
             duration_index = i
+    print(time_index,duration_index)
     res = []
     for i in range(1, table.nrows):
         row = table.row_values(i)
@@ -123,7 +124,7 @@ def fault_time(bias=0):
         date = datetime(*xldate_as_tuple(cell, 0))
         # print(date)
         time_stamp = int(datetime.timestamp(date))*1000
-        duration = int(re.match('\d*', row[duration_index])[0])*60*1000
+        duration = int(re.match('\d*', row[duration_index])[0])*60*1000+bias
         res.append([time_stamp, time_stamp+duration])
     return res
 
@@ -177,7 +178,7 @@ def draw_abnormal_period(data,period_times=None):
 # print(len(interval_times))
 # for t in interval_times:
 #     print(t)
-
+# print(fault_time())
 # %%
 if __name__ == "__main__":
 
