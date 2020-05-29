@@ -23,7 +23,7 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_22'
+day = '2020_04_11'
 # %%
 
 
@@ -206,8 +206,8 @@ for i in range(len(interval_times)):
     # todo step3 找出这段时间内的trace
     abnormal_traces = find_abnormal_trace(execption_Interval, traces)
     # 如果是网络故障
-    # is_net_error[i] = False
-    print(is_net_error[i])
+    # print(is_net_error[i])
+    is_net_error[i] = False
     if is_net_error[i]:
         #do something
         net_error_cmdb_id = network.locate_net_error(abnormal_traces)
@@ -217,10 +217,11 @@ for i in range(len(interval_times)):
         # abnormal_traces trace 中定位到具的体节点，即cmdb_id
         abnormal_cmdb_ids = []
         # todo step4 找出异常数据中的异常节点
-        for trace in abnormal_traces:
-            abnormal_cmdb_ids += find_abnormal_span(trace)
+        # for trace in abnormal_traces:
+        #     abnormal_cmdb_ids += find_abnormal_span(trace)
         # 去重
-        abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
+        # abnormal_cmdb_ids = list(set(abnormal_cmdb_ids))
+        abnormal_cmdb_ids = list(set(network.locate_net_error(abnormal_traces)))
         abnormal_cmdb_all.append(abnormal_cmdb_ids)
         # todo step5 判断网元节点中是哪个指标有异常
         for cmdb_id in abnormal_cmdb_ids:
@@ -254,8 +255,6 @@ with open(os.path.join(save_path,"result_"+day), 'w') as f:
         for o in r:
             f.write(str(o)+'\n')
 resultForm.resultForm(result,"result_"+day)
-
-
 
 answer = to_standard_answer(result)
 with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
