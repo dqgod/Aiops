@@ -6,6 +6,8 @@ fault_id,rank,category,cmdb_id,index
 3,1,docker,docker_001,container_session_used
 4,0,docker,docker_004,container_cpu_used
 4,1,docker,docker_005,container_cpu_used
+5,0,db,db_007,MEM_real_util
+5,1,db,db_007,Proc_User_Used_Pct
 6,0,docker,docker_002,container_cpu_used
 6,1,docker,docker_007,container_cpu_used
 7,0,docker,docker_003,container_cpu_used
@@ -14,3 +16,5 @@ fault_id,rank,category,cmdb_id,index
 9,0,docker,docker_008,container_cpu_used
 9,1,docker,docker_008,container_thread_idle
 10,0,docker,docker_007,
+11,0,db,db_003,MEM_Used
+11,1,db,db_003,MEM_real_util

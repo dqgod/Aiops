@@ -23,7 +23,7 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_11'
+day = '2020_04_21'
 # %%
 
 
@@ -111,7 +111,6 @@ def find_abnormal_span(trace):
                     and root['success'] == 'True':
                 abn_ids.clear()
                 abn_ids.append(root["cmdb_id"])
-            # isError = True
         isError = root['success'] == 'False'
         # 如果没有子节点，直接返回
         if graph.get(root_id) == None:
@@ -142,21 +141,21 @@ def find_abnormal_trace(execption_Interval, traces):
             abnormal_trace.append(trace)
     return abnormal_trace
 
-def to_standard_answer(result):
+def to_standard_answer(result,fault_ids):
     answer = {}
     # 异常时间段
-    for i,a_result in enumerate(result):
+    for fault_id, a_result in zip(fault_ids,result):
         if len(a_result)==0 or (len(a_result)==1 and len(a_result[0])==0):
             continue
         cmdb = a_result[0][0].split("_")[0] # docker
-        answer[str(i+1)]=[ cmdb, a_result[0][0] ] # docker_001
+        answer[fault_id]=[ cmdb, a_result[0][0] ] # docker_001
         if len(a_result)==1:
-            answer[str(i+1)].extend(a_result[0][1:])
-            answer[str(i+1)].append([None])
+            answer[fault_id].extend(a_result[0][1:])
+            answer[fault_id].append([None])
         else:
         # 每一个异常时间段有多个指标
             indicator_list = [an_indicator[1] for an_indicator in a_result]
-            answer[str(i+1)].append(indicator_list)
+            answer[fault_id].append(indicator_list)
     return answer
 def get_abnormal_interval(path_prex):
     business_path = os.path.join(path_prex, "业务指标", "esb.csv")
@@ -171,7 +170,7 @@ def get_abnormal_interval(path_prex):
     execption_times = abnormal_data[:, 1].astype(np.int64)
     #! 异常时间区间
     # interval_times = anomaly_detection.to_interval(execption_times)
-    interval_times = anomaly_detection.fault_time(bias=5*60*100,file_day=day)
+    interval_times,fault_ids = anomaly_detection.fault_time(bias=1*60*100,file_day=day,type=2)
     #! 对应时间区间是否是网络故障
     is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
     print(len(interval_times))
@@ -181,14 +180,14 @@ def get_abnormal_interval(path_prex):
     # 画出找到的异常区间
     anomaly_detection.draw_abnormal_period(data, interval_times)
 
-    return interval_times,is_net_error
+    return interval_times,is_net_error,fault_ids
 # %%
 # 调用链指标,平台指标,数据说明
-importlib.reload(anomaly_detection)
+# importlib.reload(anomaly_detection)
 trace_p, plat_p, data_instruction_p = data_cleaning.getPath(day)
 path_prex = data_path.get_data_path(day)
-interval_times,is_net_error = get_abnormal_interval(path_prex)
-
+interval_times,is_net_error,fault_ids = get_abnormal_interval(path_prex)
+# print(fault_ids)
 # %%
 # todo step2 获取所有trace
 traces = data_cleaning.build_trace(trace_p)
@@ -250,13 +249,13 @@ save_path = data_path.get_save_path()
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 with open(os.path.join(save_path,"result_"+day), 'w') as f:
-    for i, r in enumerate(result):
-        f.write(str(i+1)+":\n")
+    for fault_id, r in zip(fault_ids,result):
+        f.write(str(fault_id)+":\n")
         for o in r:
             f.write(str(o)+'\n')
-resultForm.resultForm(result,"result_"+day)
+resultForm.resultForm(result,"result_"+day,fault_ids)
 
-answer = to_standard_answer(result)
+answer = to_standard_answer(result,fault_ids)
 with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
     js = json.dumps(answer, indent=2)
     f.write(js)

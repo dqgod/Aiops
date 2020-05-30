@@ -53,6 +53,22 @@
       "container_fgct"
     ]
   ],
+  "5": [
+    "db",
+    "db_007",
+    [
+      "MEM_real_util",
+      "Proc_User_Used_Pct",
+      "MEM_Used",
+      "Proc_Used_Pct",
+      "MEM_Used_Pct",
+      "Login_Per_Sec",
+      "TPS_Per_Sec",
+      "Session_pct",
+      "Exec_Per_Sec",
+      "Sess_Active"
+    ]
+  ],
   "6": [
     "docker",
     "docker_002",
@@ -109,8 +125,25 @@
   "10": [
     "docker",
     "docker_007",
+    "docker_001",
     [
       null
+    ]
+  ],
+  "11": [
+    "db",
+    "db_003",
+    [
+      "MEM_Used",
+      "MEM_real_util",
+      "tnsping_result_time",
+      "MEM_Used_Pct",
+      "On_Off_State",
+      "MEM_Total",
+      "Exec_Per_Sec",
+      "Sess_Active",
+      "Row_Lock",
+      "TempTbs_Pct"
     ]
   ]
 }

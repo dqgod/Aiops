@@ -1,7 +1,7 @@
 import data_path
 import os
 import csv
-def resultForm(result,fileName,left_n=2):
+def resultForm(result,fileName,fault_ids,left_n=2):
     """
     left_n:保留数量
     """
@@ -9,8 +9,7 @@ def resultForm(result,fileName,left_n=2):
     with open(os.path.join(data_path.get_save_path(), fileName+".csv"), 'w',newline="") as f:
         writer=csv.writer(f)
         writer.writerow(header)
-        for i, r in enumerate(result):
-            fault_id = i + 1
+        for fault_id, r in zip(fault_ids,result):
             for rank in range(len(r)):
                 # 保留 left_n 个
                 if rank == left_n:
