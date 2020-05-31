@@ -80,6 +80,8 @@ def locate_net_error(traces):
     with open(save_path,'r')as f:
         normal=json.load(f)
     for key,value in avg_res.items():
+        if normal.get(key)==None:
+            continue
         normal_value=normal[key]
         #print(str(normal_value)+"  "+str(value))
         if value>6*normal_value:
