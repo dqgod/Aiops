@@ -178,7 +178,7 @@ def get_abnormal_interval(days):
     # interval_times = anomaly_detection.to_interval(execption_times)
     interval_times,fault_ids = anomaly_detection.fault_time(bias=1*60*100,file_day=days[0],type=2)
     #! 对应时间区间是否是网络故障
-    is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
+    is_net_error =[]# anomaly_detection.is_net_error_func(interval_times,abnormal_data)
     print(len(interval_times))
     for i,j in zip(interval_times,is_net_error):
         print(i,j)
@@ -214,8 +214,8 @@ for i in range(len(interval_times)):
     abnormal_traces = find_abnormal_trace(execption_Interval, traces)
     # 如果是网络故障
     # print(is_net_error[i])
-    is_net_error[i] = False
-    if is_net_error[i]:
+    # if is_net_error[i]:
+    if False:
         #do something
         net_error_cmdb_id = network.locate_net_error(abnormal_traces)
         abnormal_cmdb_all.append(net_error_cmdb_id)
