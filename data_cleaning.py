@@ -55,7 +55,7 @@ def main():
     print("程序运行完毕！花费: "+str(time.time()-time0)+" 秒")
 
 
-def build_trace(path):
+def build_trace(path,res = {}):
     """[summary]
 
     Args:
@@ -65,7 +65,6 @@ def build_trace(path):
         [type]: traces字典 格式{traceId:{ startTime:str,spans:{spanId}}} \n
     """
     # todo 将所有文件合并成 trace
-    res = {}
     print("开始trace数据合并！")
     merge_time = []
     for day in datestamps:

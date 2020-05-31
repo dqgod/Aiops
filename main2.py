@@ -23,25 +23,28 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-day = '2020_04_21'
+days = ['2020_04_23','2020_04_26']
+# days=['2020_04_21']
 # %%
 
 
-def find_abnormal_indicators(execption_Interval, cmdb_id,path):
+def find_abnormal_indicators(execption_Interval, cmdb_id,paths):
     """[该时间区间内那个指标错误]
 
     Args:
         execption_Interval ([type]): [时间区间]
         cmdb_id ([type]): [网源]
+        paths list: [path1,path2]
     """
-    kpis = None
+    kpis = {}
     abnormal_indicators = []
     # os,docker,db
     file_name = data_path.fileNames[cmdb_id.split('_')[0]]
     # file_path = os.path.join(data_path.get_data_path(),"平台指标",file_name)
     # 查看当前文件是否已经分解
     if kpi_opened.get(file_name) == None:
-        kpis = getKpis([file_name],path)
+        for p in paths:
+            kpis=getKpis([file_name],p,kpis)
         kpi_opened[file_name] = kpis
     else:
         kpis = kpi_opened[file_name]
@@ -157,10 +160,13 @@ def to_standard_answer(result,fault_ids):
             indicator_list = [an_indicator[1] for an_indicator in a_result]
             answer[fault_id].append(indicator_list)
     return answer
-def get_abnormal_interval(path_prex):
-    business_path = os.path.join(path_prex, "业务指标", "esb.csv")
+def get_abnormal_interval(days):
+    business_paths = [os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv") for day in days]
     # 获取业务指标数据，去掉表头,np.array
-    data = pd.read_csv(business_path).values
+    data = None
+    for p in business_paths:
+        data = pd.concat([data,pd.read_csv(p)],ignore_index=True)
+    data = data.values
     # 根据时间序列排序
     data = data[np.argsort(data[:, 1])]
     # todo step1 异常时间序列
@@ -170,7 +176,7 @@ def get_abnormal_interval(path_prex):
     execption_times = abnormal_data[:, 1].astype(np.int64)
     #! 异常时间区间
     # interval_times = anomaly_detection.to_interval(execption_times)
-    interval_times,fault_ids = anomaly_detection.fault_time(bias=1*60*100,file_day=day,type=2)
+    interval_times,fault_ids = anomaly_detection.fault_time(bias=1*60*100,file_day=days[0],type=2)
     #! 对应时间区间是否是网络故障
     is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
     print(len(interval_times))
@@ -184,13 +190,16 @@ def get_abnormal_interval(path_prex):
 # %%
 # 调用链指标,平台指标,数据说明
 # importlib.reload(anomaly_detection)
-trace_p, plat_p, data_instruction_p = data_cleaning.getPath(day)
-path_prex = data_path.get_data_path(day)
-interval_times,is_net_error,fault_ids = get_abnormal_interval(path_prex)
+plat_paths = [os.path.join(data_path.get_data_path(day),"平台指标") for day in days]
+interval_times,is_net_error,fault_ids = get_abnormal_interval(days)
 # print(fault_ids)
 # %%
 # todo step2 获取所有trace
-traces = data_cleaning.build_trace(trace_p)
+traces = {}
+for day in days:
+    prex_path = data_path.get_data_path(day)
+    trace_p = os.path.join(prex_path,"调用链指标")
+    data_cleaning.build_trace(trace_p,traces)
 
 # %%
 abnormal_cmdb_all = []
@@ -226,7 +235,7 @@ for i in range(len(interval_times)):
         for cmdb_id in abnormal_cmdb_ids:
             # ? 找到异常指标c 
             abnormal_indicators.extend(find_abnormal_indicators(
-                execption_Interval, cmdb_id,plat_p))
+                execption_Interval, cmdb_id,plat_paths))
             print(execption_Interval, cmdb_id)
         # 对得到的异常指标进行排序
         abnormal_indicators = sorted(
@@ -248,15 +257,15 @@ print(len(result))
 save_path = data_path.get_save_path()
 if not os.path.exists(save_path):
     os.mkdir(save_path)
-with open(os.path.join(save_path,"result_"+day), 'w') as f:
+with open(os.path.join(save_path,"result_"+days[0]), 'w') as f:
     for fault_id, r in zip(fault_ids,result):
         f.write(str(fault_id)+":\n")
         for o in r:
             f.write(str(o)+'\n')
-resultForm.resultForm(result,"result_"+day,fault_ids)
+resultForm.resultForm(result,"result_"+days[0],fault_ids)
 
 answer = to_standard_answer(result,fault_ids)
-with open(os.path.join(save_path,"answer_"+day+".json"), 'w') as f:
+with open(os.path.join(save_path,"answer_"+days[0]+".json"), 'w') as f:
     js = json.dumps(answer, indent=2)
     f.write(js)
 

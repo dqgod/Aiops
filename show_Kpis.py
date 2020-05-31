@@ -8,7 +8,7 @@ import data_path
 # %%
 
 
-def getKpis(files=None, path=None):
+def getKpis(files=None, path=None,kpis = {}):
     """[获取KPI曲线数据,将所有指标数据读到内存]
 
     Args:
@@ -20,7 +20,6 @@ def getKpis(files=None, path=None):
     if not path:
         path = os.path.join(data_path.get_data_path(), "平台指标")
     files = os.listdir(path) if not files else files
-    kpis = {}
     for f in files:
         # f = "dcos_docker.csv"
         p = os.path.join(path, f)

@@ -106,6 +106,7 @@ def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
 def fault_time(bias=0,file_day="2020_04_11",type = 0):
     """[summary]
     直接读文件读出 故障时间
+    file_day: 数据说明所在的目录
     """
     table = read_xlrd(os.path.join(
         data_path.get_data_path(file_day), "数据说明", "0故障说明.xlsx"))

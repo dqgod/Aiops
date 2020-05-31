@@ -74,13 +74,13 @@
       "Exec_Per_Sec",
       "TPS_Per_Sec",
       "Call_Per_Sec",
-      "DbTime",
       "DFParaWrite_Per_Sec",
       "MEM_real_util",
       "container_cpu_used",
-      "container_cpu_used",
       "Sess_Active",
-      "SeqRead_Per_Sec"
+      "DbTime",
+      "SeqRead_Per_Sec",
+      "Session_pct"
     ]
   ],
   "19": [
@@ -94,8 +94,8 @@
       "Login_Per_Sec",
       "Proc_Used_Pct",
       "Proc_User_Used_Pct",
-      "Session_pct",
       "TPS_Per_Sec",
+      "Session_pct",
       "Call_Per_Sec"
     ]
   ],
@@ -105,14 +105,14 @@
     [
       "container_cpu_used",
       "container_cpu_used",
-      "container_thread_running",
       "container_session_used",
+      "container_thread_running",
       "container_mem_used",
-      "container_fgct",
-      "container_thread_used_pct",
       "container_fgc",
+      "container_thread_used_pct",
+      "container_thread_idle",
       "container_thread_total",
-      "container_thread_idle"
+      "container_fgct"
     ]
   ],
   "21": [
@@ -136,14 +136,14 @@
     [
       "container_cpu_used",
       "container_cpu_used",
+      "container_cpu_used",
       "container_mem_used",
       "container_thread_running",
       "container_thread_idle",
       "container_fgc",
       "container_thread_total",
       "container_session_used",
-      "container_thread_used_pct",
-      "container_fgct"
+      "container_thread_used_pct"
     ]
   ],
   "23": [
