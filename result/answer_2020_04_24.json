@@ -62,18 +62,18 @@
   ],
   "44": [
     "docker",
-    "docker_006",
+    "docker_002",
     [
-      "container_thread_idle",
-      "container_fgc",
-      "container_mem_used",
-      "container_session_used",
-      "container_thread_used_pct",
+      "container_fgct",
       "container_thread_total",
+      "container_mem_used",
       "container_thread_running",
-      "container_fgct",
-      "container_fgct",
-      "container_thread_total"
+      "container_fgc",
+      "container_thread_idle",
+      "container_thread_used_pct",
+      "container_session_used",
+      "container_thread_idle",
+      "container_fgc"
     ]
   ],
   "45": [
@@ -102,16 +102,16 @@
     "db",
     "db_007",
     [
-      "MEM_real_util",
       "MEM_Used",
       "MEM_Total",
       "MEM_Used_Pct",
+      "MEM_real_util",
       "CPU_free_pct",
-      "CPU_Used_Pct",
-      "On_Off_State",
-      "tnsping_result_time",
-      "AIOS",
-      "Row_Lock"
+      "Login_Per_Sec",
+      "Sess_Connect",
+      "Exec_Per_Sec",
+      "DbTime",
+      "Call_Per_Sec"
     ]
   ],
   "48": [
@@ -135,13 +135,13 @@
     [
       "container_fgct",
       "container_thread_total",
-      "container_mem_used",
       "container_thread_running",
       "container_fgc",
       "container_thread_idle",
       "container_thread_used_pct",
       "container_session_used",
-      "container_cpu_used"
+      "container_cpu_used",
+      "container_mem_used"
     ]
   ],
   "50": [

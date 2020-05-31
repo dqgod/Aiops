@@ -7,13 +7,13 @@ fault_id,rank,category,cmdb_id,index
 42,1,docker,docker_002,container_thread_total
 43,0,docker,docker_001,container_thread_running
 43,1,docker,docker_001,container_thread_total
-44,0,docker,docker_006,container_thread_idle
-44,1,docker,docker_006,container_fgc
+44,0,docker,docker_002,container_fgct
+44,1,docker,docker_002,container_thread_total
 45,0,docker,docker_008,
 46,0,docker,docker_004,container_thread_running
 46,1,docker,docker_004,container_thread_used_pct
-47,0,db,db_007,MEM_real_util
-47,1,db,db_007,MEM_Used
+47,0,db,db_007,MEM_Used
+47,1,db,db_007,MEM_Total
 48,0,docker,docker_008,container_thread_total
 48,1,docker,docker_008,container_fgct
 49,0,docker,docker_002,container_fgct
