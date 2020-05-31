@@ -23,8 +23,8 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-days = ['2020_04_23','2020_04_26']
-# days=['2020_04_21']
+# days = ['2020_04_23','2020_04_26']
+days=['2020_04_21']
 # %%
 
 
@@ -180,7 +180,6 @@ def get_abnormal_interval(days):
     #! 对应时间区间是否是网络故障
     is_net_error = anomaly_detection.is_net_error_func(interval_times,abnormal_data)
     print(len(interval_times))
-    period_times = anomaly_detection.fault_time()
     for i,j in zip(interval_times,is_net_error):
         print(i,j)
     # 画出找到的异常区间

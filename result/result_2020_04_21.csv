@@ -7,7 +7,7 @@ fault_id,rank,category,cmdb_id,index
 15,1,docker,docker_008,container_thread_idle
 16,0,docker,docker_008,
 17,0,docker,docker_003,container_cpu_used
-17,1,docker,docker_004,container_cpu_used
+17,1,docker,docker_003,container_thread_used_pct
 18,0,db,db_003,Exec_Per_Sec
 18,1,db,db_003,TPS_Per_Sec
 19,0,db,db_003,MEM_real_util
@@ -16,7 +16,7 @@ fault_id,rank,category,cmdb_id,index
 20,1,docker,docker_005,container_cpu_used
 21,0,docker,docker_006,container_cpu_used
 21,1,docker,docker_006,container_mem_used
-22,0,docker,docker_006,container_cpu_used
-22,1,docker,docker_004,container_cpu_used
+22,0,docker,docker_004,container_cpu_used
+22,1,docker,docker_006,container_cpu_used
 23,0,docker,docker_003,container_cpu_used
 23,1,docker,docker_003,container_thread_used_pct

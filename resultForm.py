@@ -22,7 +22,7 @@ def resultForm(result,fileName,fault_ids,left_n=2):
                 category=cmdb_id.split("_")[0]
                 index=r[rank][1] if len(r)>1 else None
                 row=[fault_id,rank,category,cmdb_id,index]
-                print(row)
+                # print(row)
                 writer.writerow(row)
 
 

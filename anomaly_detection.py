@@ -103,7 +103,7 @@ def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     # data.to_csv('outliers.csv', columns=["pred", ], header=False)
     return np.array(all_pred)
     
-def fault_time(bias=0,file_day="2020_04_11",type = 0):
+def fault_time(file_day,bias=0,type = 0):
     """[summary]
     直接读文件读出 故障时间
     file_day: 数据说明所在的目录

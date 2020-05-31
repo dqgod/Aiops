@@ -18,9 +18,9 @@ def getPath(day=None):
     p3 = os.path.join(prex_path,"数据说明")
     return p1,p2,p3
 
-path, path2, path3 = getPath() #路径
+path, path2, path3 = 0,0,0
 
-
+day = '2020_04_11'
 fileNames = data_path.fileNames
 # datestamps=["datestamp=2020-02-14","datestamp=2020-02-15","datestamp=2020-02-16","datestamp=2020-02-17","datestamp=2020-02-18","datestamp=2020-02-19","datestamp=2020-02-20"]
 datestamps = [""]
@@ -30,12 +30,14 @@ traceNames = data_path.traceNames
 # todo { cmd_id:{ timestamp:123456,values:{}}}
 kpis = {}  # 记录下指标
 # todo {db:{  indicator1:time1,indcator2:time2}}
-indicators = fill_all_indicators(path3)
+indicators = None
 # todo 保存当前已经加载的 文件（后面可能会用到）
 file_now = {}
 
 bias = 10*1000
 def main():
+    path,path2,path3 = getPath(day) #路径
+    indicators = fill_all_indicators(path3)
     time0 = time.time()
     if len(os.listdir(path2))<=5:
         divide_file(path2)
