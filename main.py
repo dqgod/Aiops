@@ -226,7 +226,7 @@ for day in days:
 
 # %%
 abnormal_cmdb_all = []
-# 结果
+# 结果..
 result = [ 0 for _ in range(len(interval_times))]
 #? 遍历每一个时间端
 for i in range(len(interval_times)):
