@@ -80,7 +80,7 @@ def is_net_error_func(intervals,abnormal_data, n=0.9):
         is_net_error.append(succee_rate_equal_one/total > n)
     return is_net_error
 
-def RRCF(num_trees,shingle_size,tree_size,data):
+def RRCF(data,num_trees=40,shingle_size=4,tree_size=128):
     """[Robust Random Cut Forest]
     Args:
         num_trees ([type]): [森林中树的数量]]
@@ -108,6 +108,7 @@ def RRCF(num_trees,shingle_size,tree_size,data):
             if not index in avg_codisp:
                 avg_codisp[index] = 0
             avg_codisp[index] += tree.codisp(index) / num_trees
+    avg_codisp = list(map(lambda x:x[1], sorted(avg_codisp.items(),key=lambda y:y[0])))
     return avg_codisp
     
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):

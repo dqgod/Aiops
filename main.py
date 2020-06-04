@@ -70,17 +70,17 @@ def anomaly_detection_func_by_RRCF(execption_Interval, data):
     # 根据时间戳排序
     data.sort_values("timestamp", inplace=True)
     # 得到预测值
-    pred = anomaly_detection.RRCF(num_trees=40,shingle_size=4,tree_size=256,data=data["value"].values.astype(np.float64))
+    pred = anomaly_detection.RRCF(data=data['value'].values.astype(np.float64),num_trees=40,shingle_size=4,tree_size=256)
     # data['pred'] = pred
     # data.to_csv('outliers2.csv', columns=["timestamp",'value',"pred", ], header=False)
     timestamps = data['timestamp'].values.astype(np.int64)
     total, abnormal_data_total = 0, 0
-    for timestamp, pred_num in zip(timestamps[:,len(pred)], pred):
+    for timestamp, pred_num in zip(timestamps[:len(pred)], pred):
         if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
             total += 1
             abnormal_data_total += pred_num
 
-    return abnormal_data_total
+    return abnormal_data_total/total
 
 
 def anomaly_detection_func(execption_Interval, data):
@@ -101,7 +101,7 @@ def anomaly_detection_func(execption_Interval, data):
     # data.to_csv('outliers2.csv', columns=["timestamp",'value',"pred", ], header=False)
     timestamps = data['timestamp'].values.astype(np.int64)
     total, abnormal_data_total = 0, 0
-    for timestamp, pred_num in zip(timestamps, pred):
+    for timestamp, pred_num in zip(timestamps[:len(pred)], pred):
         if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
             total += 1
             abnormal_data_total += 1 if pred_num == -1 else 0
