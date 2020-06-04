@@ -79,10 +79,18 @@ def is_net_error_func(intervals,abnormal_data, n=0.9):
         # print(succee_rate_equal_one,total,succee_rate_equal_one/total)
         is_net_error.append(succee_rate_equal_one/total > n)
     return is_net_error
+
 def RRCF(num_trees,shingle_size,tree_size,data):
+    """[Robust Random Cut Forest]
+    Args:
+        num_trees ([type]): [森林中树的数量]]
+        shingle_size ([type]): [窗口大小]
+        tree_size ([type]): [树的大小，即树中有多少叶子节点]
+        data ([type]): [数据]
+    Returns:
+        [type]: [每一行数据的平局得分]
+    """
     forest = []
-    data=data.values.astype(np.int64)
-    print(data)
     for _ in range(num_trees):
         tree = rrcf.RCTree()
         forest.append(tree)
@@ -101,6 +109,7 @@ def RRCF(num_trees,shingle_size,tree_size,data):
                 avg_codisp[index] = 0
             avg_codisp[index] += tree.codisp(index) / num_trees
     return avg_codisp
+    
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     ilf = IsolationForest(n_estimators=n_estimators,
                           n_jobs=n_jobs,          # 使用全部cpu
