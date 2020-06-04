@@ -12,6 +12,7 @@ from read_data import readCsvWithPandas, readCSV,read_xlrd
 from datetime import datetime
 from xlrd import xldate_as_tuple
 from sklearn.ensemble import IsolationForest
+import rrcf
 n = 3
 # path = os.path.join(data_path.get_data_path(), "调用链指标")
 
@@ -78,7 +79,28 @@ def is_net_error_func(intervals,abnormal_data, n=0.9):
         # print(succee_rate_equal_one,total,succee_rate_equal_one/total)
         is_net_error.append(succee_rate_equal_one/total > n)
     return is_net_error
-
+def RRCF(num_trees,shingle_size,tree_size,data):
+    forest = []
+    data=data.values.astype(np.int64)
+    print(data)
+    for _ in range(num_trees):
+        tree = rrcf.RCTree()
+        forest.append(tree)
+    points = rrcf.shingle(data, size=shingle_size)
+    avg_codisp = {}
+    for index, point in enumerate(points):
+        # For each tree in the forest...
+        for tree in forest:
+            # If tree is above permitted size, drop the oldest point (FIFO)
+            if len(tree.leaves) > tree_size:
+                tree.forget_point(index - tree_size)
+            # Insert the new point into the tree
+            tree.insert_point(point, index=index)
+            # Compute codisp on the new point and take the average among all trees
+            if not index in avg_codisp:
+                avg_codisp[index] = 0
+            avg_codisp[index] += tree.codisp(index) / num_trees
+    return avg_codisp
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     ilf = IsolationForest(n_estimators=n_estimators,
                           n_jobs=n_jobs,          # 使用全部cpu

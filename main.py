@@ -24,7 +24,7 @@ isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
 # days = ['2020_04_23','2020_04_26']
-days=['2020_04_21']
+days=['2020_04_11']
 # %%
 
 
@@ -53,10 +53,34 @@ def find_abnormal_indicators(execption_Interval, cmdb_id,paths):
         temp = k.split(',')  # (cmdb_id,name,bomc_id,itemid)
         if cmdb_id == temp[0]:
             # todo 进行异常评估，给出得分
-            score = anomaly_detection_func(execption_Interval, np.array(v))
+            score = anomaly_detection_func_by_RRCF(execption_Interval, np.array(v))
             abnormal_indicators.append([temp[0], temp[1], temp[2], score])
     # 排序返回得分最高的三个
     return abnormal_indicators
+def anomaly_detection_func_by_RRCF(execption_Interval, data):
+    """[异常检测算法]
+
+    Args:
+        execption_Interval ([tutle]): [时间区间(start_time,end_time)]
+        data ([type]): [itemid,name,bomc_id,timestamp,valuee,cmdb_id]
+    """
+    data = pd.DataFrame(data)
+    data.columns = ['itemid', 'name', 'bomc_id',
+                    'timestamp', 'value', 'cmdb_id']
+    # 根据时间戳排序
+    data.sort_values("timestamp", inplace=True)
+    # 得到预测值
+    pred = anomaly_detection.RRCF(40,4,256,data["value"])
+    data['pred'] = pred
+    # data.to_csv('outliers2.csv', columns=["timestamp",'value',"pred", ], header=False)
+    timestamps = data['timestamp'].values.astype(np.int64)
+    total, abnormal_data_total = 0, 0
+    for timestamp, pred_num in zip(timestamps, pred):
+        if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
+            total += 1
+            abnormal_data_total += pred_num
+
+    return abnormal_data_total
 
 
 def anomaly_detection_func(execption_Interval, data):
@@ -176,10 +200,10 @@ def get_abnormal_interval(days):
     execption_times = abnormal_data[:, 1].astype(np.int64)
     #! 异常时间区间
     # interval_times = anomaly_detection.to_interval(execption_times)
-    interval_times,fault_ids = anomaly_detection.fault_time(bias=1*60*100,file_day=days[0],type=2)
+    interval_times,fault_ids = anomaly_detection.fault_time(bias=0*60*100,file_day=days[0],type=2)
+    print(str(interval_times))
     #! 对应时间区间是否是网络故障
     is_net_error =[]# anomaly_detection.is_net_error_func(interval_times,abnormal_data)
-    print(len(interval_times))
     for i,j in zip(interval_times,is_net_error):
         print(i,j)
     # 画出找到的异常区间
