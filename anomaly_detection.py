@@ -12,7 +12,7 @@ from read_data import readCsvWithPandas, readCSV,read_xlrd
 from datetime import datetime
 from xlrd import xldate_as_tuple
 from sklearn.ensemble import IsolationForest
-import rrcf
+# import rrcf
 n = 3
 # path = os.path.join(data_path.get_data_path(), "调用链指标")
 
@@ -90,26 +90,27 @@ def RRCF(data,num_trees=40,shingle_size=4,tree_size=128):
     Returns:
         [type]: [每一行数据的平局得分]
     """
-    forest = []
-    for _ in range(num_trees):
-        tree = rrcf.RCTree()
-        forest.append(tree)
-    points = rrcf.shingle(data, size=shingle_size)
-    avg_codisp = {}
-    for index, point in enumerate(points):
-        # For each tree in the forest...
-        for tree in forest:
-            # If tree is above permitted size, drop the oldest point (FIFO)
-            if len(tree.leaves) > tree_size:
-                tree.forget_point(index - tree_size)
-            # Insert the new point into the tree
-            tree.insert_point(point, index=index)
-            # Compute codisp on the new point and take the average among all trees
-            if not index in avg_codisp:
-                avg_codisp[index] = 0
-            avg_codisp[index] += tree.codisp(index) / num_trees
-    avg_codisp = list(map(lambda x:x[1], sorted(avg_codisp.items(),key=lambda y:y[0])))
-    return avg_codisp
+    # forest = []
+    # for _ in range(num_trees):
+    #     tree = rrcf.RCTree()
+    #     forest.append(tree)
+    # points = rrcf.shingle(data, size=shingle_size)
+    # avg_codisp = {}
+    # for index, point in enumerate(points):
+    #     # For each tree in the forest...
+    #     for tree in forest:
+    #         # If tree is above permitted size, drop the oldest point (FIFO)
+    #         if len(tree.leaves) > tree_size:
+    #             tree.forget_point(index - tree_size)
+    #         # Insert the new point into the tree
+    #         tree.insert_point(point, index=index)
+    #         # Compute codisp on the new point and take the average among all trees
+    #         if not index in avg_codisp:
+    #             avg_codisp[index] = 0
+    #         avg_codisp[index] += tree.codisp(index) / num_trees
+    # avg_codisp = list(map(lambda x:x[1], sorted(avg_codisp.items(),key=lambda y:y[0])))
+    # return avg_codisp
+    pass
     
 def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     ilf = IsolationForest(n_estimators=n_estimators,

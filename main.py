@@ -23,8 +23,9 @@ left_n = 10  # 保留几个结果
 isExecutor = {"JDBC": False, "LOCAL": False, "CSF": False,
               "FlyRemote": True, "OSB": True, "RemoteProcess": True}
 # 哪一天的数据
-# days = ['2020_04_23','2020_04_26']
-days=['2020_04_11']
+# days = ['2020_05_22']
+days=['2020_05_22','2020_05_23','2020_05_24','2020_05_25','2020_05_26'
+    ,'2020_05_27','2020_05_28','2020_05_29','2020_05_30','2020_05_31']
 # %%
 
 
@@ -53,7 +54,7 @@ def find_abnormal_indicators(execption_Interval, cmdb_id,paths):
         temp = k.split(',')  # (cmdb_id,name,bomc_id,itemid)
         if cmdb_id == temp[0]:
             # todo 进行异常评估，给出得分
-            score = anomaly_detection_func_by_RRCF(execption_Interval, np.array(v))
+            score = anomaly_detection_func(execption_Interval, np.array(v))
             abnormal_indicators.append([temp[0], temp[1], temp[2], score])
     # 排序返回得分最高的三个
     return abnormal_indicators
@@ -75,7 +76,7 @@ def anomaly_detection_func_by_RRCF(execption_Interval, data):
     # data.to_csv('outliers2.csv', columns=["timestamp",'value',"pred", ], header=False)
     timestamps = data['timestamp'].values.astype(np.int64)
     total, abnormal_data_total = 0, 0
-    for timestamp, pred_num in zip(timestamps[:len(pred)], pred):
+    for timestamp, pred_num in zip(timestamps, pred):
         if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
             total += 1
             abnormal_data_total += pred_num
@@ -101,7 +102,7 @@ def anomaly_detection_func(execption_Interval, data):
     # data.to_csv('outliers2.csv', columns=["timestamp",'value',"pred", ], header=False)
     timestamps = data['timestamp'].values.astype(np.int64)
     total, abnormal_data_total = 0, 0
-    for timestamp, pred_num in zip(timestamps[:len(pred)], pred):
+    for timestamp, pred_num in zip(timestamps, pred):
         if timestamp < execption_Interval[1] and timestamp > execption_Interval[0]:
             total += 1
             abnormal_data_total += 1 if pred_num == -1 else 0
