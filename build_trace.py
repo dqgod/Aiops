@@ -102,7 +102,7 @@ def build_trace(days, res={}):
     return res
 
 
-def getKPIs(timeStamp, cmd_id, bias=0):
+def getKPIs(timeStamp, cmd_id, bias=0, day= "2020_04_22"):
     if not cmd_id:
         return {}
     key = cmd_id.split('_')[0]
@@ -113,7 +113,8 @@ def getKPIs(timeStamp, cmd_id, bias=0):
     # 遍历所有指标名，闭关将相应的指标获取
     for bomc_id, (sample_period, indicator_name) in indicators[key].items():
         # csv 路径
-        file_path = os.path.join(path2, key, indicator_name + ".csv")
+        plat_path = os.path.join(data_path.get_data_path(day), "平台指标")
+        file_path = os.path.join(plat_path, key, indicator_name + ".csv")
         # 指标名，取样周期
         valueJson.update(get_kpis_for_an_indicator(
             timeStamp, cmd_id, bomc_id, sample_period*1000, file_path))
@@ -224,7 +225,7 @@ def saveJson(res, save_path, filename):
     print("保存完毕!花费 "+str(time.time()-start_time)+"S")
 
 
-def generate_KPIs_for_trace(trace):
+def generate_KPIs_for_trace(trace, day= "2020_04_22"):
     """
     传入一条 trace， 并得到他的KPIs \n
     trace格式 {starttime:111111, spans:{}}
@@ -242,7 +243,7 @@ def generate_KPIs_for_trace(trace):
         #     v['target'] if "db" in v['target'] else None)
 
         cmd_id = span['cmdb_id'] if not span['db'] else span['db']
-        span['KPIs'] = getKPIs(int(span["timestamp"]), span['cmdb_id'], bias)
+        span['KPIs'] = getKPIs(int(span["timestamp"]), span['cmdb_id'], bias, day = "2020_04_22")
 
 
 def generateGraph(trace_spans):
