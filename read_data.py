@@ -1,8 +1,12 @@
+from sys import path_hooks
+from matplotlib.pyplot import table
 import xlrd
 import os
 import csv
 import pandas as pd
 import json
+import data_path
+import os
 def read_xlrd(excelFile):
     '''
     读取Execel
@@ -42,3 +46,11 @@ def read_json(p):
     with open(p,'r')as f:
         json_data=json.load(f)
         return json_data
+
+if __name__ == '__main__':
+    print("daf")
+    day = "2020_05_22"
+    path = os.path.join(data_path.get_data_path(day), "数据说明", "0故障说明.xlsx")
+    table = read_xlrd(path)
+    print(table)
+    

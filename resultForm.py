@@ -6,7 +6,7 @@ def resultForm(result,fileName,fault_ids,left_n=2):
     left_n:保留数量
     """
     header=['fault_id','rank','category','cmdb_id','index']
-    with open(os.path.join(data_path.get_save_path(), fileName+".csv"), 'w',newline="") as f:
+    with open(os.path.join(data_path.result_save_path(), fileName+".csv"), 'w',newline="") as f:
         writer=csv.writer(f)
         writer.writerow(header)
         for fault_id, r in zip(fault_ids,result):

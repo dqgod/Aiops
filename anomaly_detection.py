@@ -1,3 +1,4 @@
+#coding:utf-8
 # %%
 import csv
 import os
@@ -16,10 +17,12 @@ from sklearn.ensemble import IsolationForest
 n = 3
 # path = os.path.join(data_path.get_data_path(), "调用链指标")
 
+plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
+plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
 # %%
 
-
-def find_abnormal_data(data):
+# k sigma 算法
+def find_abnormal_data(data, k=3):
     """
     在入口服务中，找到异常的数据的时间戳
     data: [serviceName,startTime,avg_time,num,succee_num,succee_rate]
@@ -32,8 +35,8 @@ def find_abnormal_data(data):
     std = np.std(avg_times_temp, ddof=1)
     means = np.mean(avg_times_temp)
 
-    high = means+3*std
-    low = means-3*std
+    high = means+k*std
+    low = means-k*std
     # print(high,low)
     def lam(i): return avg_times[i] > high or avg_times[i] < low or succee_rate[i] < 1
     res = data[list(filter(lam,  range(len(data))))]
@@ -135,7 +138,7 @@ def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     # data['pred'] = all_pred
     # data.to_csv('outliers.csv', columns=["pred", ], header=False)
     return np.array(all_pred)
-    
+
 def fault_time(file_day,bias=0,type = 0):
     """[summary]
     直接读文件读出 故障时间
@@ -181,21 +184,27 @@ def draw_abnormal_period(data,period_times=None):
                 index[j].append(i)
 
     plt.figure(figsize=(8, 5))
+    #! 第一个图
+    plt.subplot(2, 1, 1)
     # 获取平均处理时间一列
     y = data[:, 2].astype(np.float32)
-    plt.subplot(2, 1, 1)
     # plt.title("平均调用时间")
     plt.plot(x, y, label="平均调用时间")
     for i in index:
         plt.plot(i,np.ones(len(i))*40,color='y')
+    # plt.title('平均调用时间')
+    plt.ylabel('平均调用时间')
+    plt.xlabel('时间轴')
 
+
+    #! 第二个图
+    plt.subplot(2, 1, 2)
     # 获取成功率一列
     y = data[:, 5].astype(np.float32)
-    plt.subplot(2, 1, 2)
     # plt.title("成功率")
     plt.plot(x, y, color='r', label="成功率")
-    
-        
+    plt.ylabel('成功率')
+    plt.xlabel('时间轴')
     for i in index:
         plt.plot(i,np.ones(len(i))*0.5,color='y')
 
@@ -224,8 +233,9 @@ def draw_abnormal_period(data,period_times=None):
 # %%
 if __name__ == "__main__":
 
+    day = "2020_05_22"
     # 业务指标
-    business_path = os.path.join(data_path.get_data_path(), "业务指标", "esb.csv")
+    business_path = os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv")
 
     # 获取业务指标数据，去掉表头,np.array
     data = readCsvWithPandas(business_path)
@@ -245,3 +255,4 @@ if __name__ == "__main__":
         print(i,j)
     # 画出找到的异常区间
     draw_abnormal_period(data, interval_times)
+# %%

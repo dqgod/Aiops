@@ -54,7 +54,7 @@ def count(traces):
 # #print(res)
 # json_str = json.dumps(avg_res,indent=4)
 # # print(json_str)
-# save_path = data_path.get_save_path()
+# save_path = data_path.result_save_path()
 # if not os.path.exists(save_path):
 #     os.mkdir(save_path)
 # with open(os.path.join(save_path,"count.json"),'w')as f:
@@ -76,7 +76,7 @@ def locate_net_error(traces):
     #与正常情况下的平均调用世家对比，找出异常
     abnormal_calls=[]
     normal = None
-    save_path = os.path.join(data_path.get_save_path(),"count.json")
+    save_path = os.path.join(data_path.result_save_path(),"count.json")
     with open(save_path,'r')as f:
         normal=json.load(f)
     for key,value in avg_res.items():

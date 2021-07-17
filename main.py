@@ -185,6 +185,8 @@ def to_standard_answer(result,fault_ids):
             indicator_list = [an_indicator[1] for an_indicator in a_result]
             answer[fault_id].append(indicator_list)
     return answer
+
+## 得到异常时间段
 def get_abnormal_interval(days):
     business_paths = [os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv") for day in days]
     # 获取业务指标数据，去掉表头,np.array
@@ -278,7 +280,7 @@ for i in abnormal_cmdb_all:
 print(len(result))
 # for i in result:
 #     print(i)
-save_path = data_path.get_save_path()
+save_path = data_path.result_save_path()
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 with open(os.path.join(save_path,"result_"+days[0]), 'w') as f:

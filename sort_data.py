@@ -23,11 +23,13 @@ def order(path):
                 writer.writerow(row)
         print("文件"+file+"排序完成")
 
-
+#! 将平台指标的每一中指标拆分开，单独一个csv
 def divide_file(path,save_path = None): # 返回文件存储路径
     files = os.listdir(path)
+    
     save_path = path if not save_path else save_path
     for file_name in files:
+        # 跳过文件夹，只读取csv文件
         if "csv" not in file_name:
             continue
         # 读取一个文件数据
