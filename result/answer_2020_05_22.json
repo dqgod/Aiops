@@ -1,30 +1,30 @@
 {
   "100": [
-    "db",
-    "db_003",
+    "docker",
+    "docker_001",
     [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Sess_Connect",
-      "Exec_Per_Sec",
-      "Proc_Used_Pct",
-      "Proc_User_Used_Pct",
-      "MEM_Used_Pct",
-      "CPU_Used_Pct",
-      "MEM_Used",
-      "CPU_free_pct"
+      "container_thread_idle",
+      "container_thread_total",
+      "container_fgct",
+      "container_cpu_used",
+      "container_session_used",
+      "container_mem_used",
+      "container_thread_running",
+      "container_fgc",
+      "container_thread_used_pct",
+      "CPU_Used_Pct"
     ]
   ],
   "101": [
     "docker",
     "docker_001",
     [
-      "container_cpu_used",
-      "container_mem_used",
       "container_thread_idle",
       "container_thread_total",
       "container_fgct",
+      "container_cpu_used",
       "container_session_used",
+      "container_mem_used",
       "container_thread_running",
       "container_fgc",
       "container_thread_used_pct"
@@ -41,815 +41,61 @@
     "db",
     "db_003",
     [
+      "Row_Lock",
+      "Hang",
+      "MEM_Total",
       "Proc_Used_Pct",
       "Proc_User_Used_Pct",
-      "Exec_Per_Sec",
       "AWS",
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "MEM_Used",
-      "MEM_Used_Pct",
+      "Exec_Per_Sec",
       "MEM_real_util",
-      "container_thread_running"
+      "MEM_Used",
+      "MEM_Used_Pct"
     ]
   ],
   "104": [
     "docker",
     "docker_001",
     [
-      null
+      "container_thread_idle",
+      "container_thread_total",
+      "container_fgct",
+      "container_cpu_used",
+      "container_session_used",
+      "container_mem_used",
+      "container_thread_running",
+      "container_fgc",
+      "container_thread_used_pct"
     ]
   ],
   "105": [
     "docker",
     "docker_001",
     [
-      null
+      "container_thread_idle",
+      "container_thread_total",
+      "container_fgct",
+      "container_cpu_used",
+      "container_session_used",
+      "container_mem_used",
+      "container_thread_running",
+      "container_fgc",
+      "container_thread_used_pct"
     ]
   ],
   "106": [
     "docker",
     "docker_001",
     [
-      "container_cpu_used",
       "container_thread_idle",
       "container_thread_total",
       "container_fgct",
+      "container_cpu_used",
       "container_session_used",
       "container_mem_used",
       "container_thread_running",
       "container_fgc",
       "container_thread_used_pct"
-    ]
-  ],
-  "107": [
-    "docker",
-    "docker_004",
-    [
-      "container_mem_used",
-      "container_cpu_used",
-      "container_fgc",
-      "container_session_used",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_mem_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_thread_running"
-    ]
-  ],
-  "108": [
-    "db",
-    "db_003",
-    [
-      "Proc_User_Used_Pct",
-      "MEM_real_util",
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "Proc_Used_Pct",
-      "Login_Per_Sec",
-      "TPS_Per_Sec",
-      "CPU_Used_Pct",
-      "Session_pct",
-      "Sess_Connect"
-    ]
-  ],
-  "109": [
-    "docker",
-    "docker_003",
-    "docker_004",
-    [
-      null
-    ]
-  ],
-  "111": [
-    "docker",
-    "docker_006",
-    [
-      "container_cpu_used",
-      "container_fgc",
-      "container_session_used",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_thread_running",
-      "container_fgct"
-    ]
-  ],
-  "112": [
-    "docker",
-    "docker_003",
-    "docker_004",
-    [
-      null
-    ]
-  ],
-  "113": [
-    "docker",
-    "docker_006",
-    [
-      "container_cpu_used",
-      "container_fgc",
-      "container_session_used",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_thread_running",
-      "container_fgct"
-    ]
-  ],
-  "114": [
-    "docker",
-    "docker_003",
-    [
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc"
-    ]
-  ],
-  "115": [
-    "docker",
-    "docker_007",
-    [
-      null
-    ]
-  ],
-  "116": [
-    "docker",
-    "docker_004",
-    [
-      null
-    ]
-  ],
-  "117": [
-    "db",
-    "db_007",
-    [
-      "On_Off_State",
-      "MEM_real_util",
-      "MEM_Total",
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "tnsping_result_time",
-      "CPU_free_pct",
-      "CPU_Used_Pct",
-      "AIOS",
-      "Row_Lock"
-    ]
-  ],
-  "118": [
-    "docker",
-    "docker_002",
-    [
-      null
-    ]
-  ],
-  "119": [
-    "docker",
-    "docker_005",
-    [
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc"
-    ]
-  ],
-  "120": [
-    "docker",
-    "docker_006",
-    [
-      "container_cpu_used",
-      "container_mem_used",
-      "container_fgc",
-      "container_session_used",
-      "container_thread_used_pct",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_thread_running",
-      "container_fgct"
-    ]
-  ],
-  "121": [
-    "docker",
-    "docker_004",
-    [
-      null
-    ]
-  ],
-  "122": [
-    "db",
-    "db_003",
-    [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "container_cpu_used",
-      "AWS",
-      "SctRead_Per_Sec",
-      "MEM_real_util",
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_cpu_used"
-    ]
-  ],
-  "123": [
-    "db",
-    "db_003",
-    [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "CPU_free_pct",
-      "CPU_Used_Pct",
-      "SeqRead_Per_Sec",
-      "AWS",
-      "container_cpu_used",
-      "container_cpu_used",
-      "Used_Tbs_Size"
-    ]
-  ],
-  "124": [
-    "db",
-    "db_003",
-    [
-      "MEM_real_util",
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "CPU_free_pct",
-      "CPU_Used_Pct",
-      "On_Off_State",
-      "Used_Tbs_Size",
-      "SEQ_Used_Pct",
-      "PGA_used_total",
-      "Proc_Used_Pct"
-    ]
-  ],
-  "125": [
-    "docker",
-    "docker_003",
-    [
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc"
-    ]
-  ],
-  "126": [
-    "db",
-    "db_007",
-    [
-      "MEM_real_util",
-      "Login_Per_Sec",
-      "Sess_Connect",
-      "CPU_Used_Pct",
-      "SeqRead_Per_Sec",
-      "Session_pct",
-      "SctRead_Per_Sec",
-      "Exec_Per_Sec",
-      "PGA_used_total",
-      "MEM_Total"
-    ]
-  ],
-  "127": [
-    "docker",
-    "docker_008",
-    [
-      null
-    ]
-  ],
-  "128": [
-    "docker",
-    "docker_004",
-    [
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc"
-    ]
-  ],
-  "129": [
-    "docker",
-    "docker_002",
-    "docker_007",
-    "docker_008",
-    [
-      null
-    ]
-  ],
-  "130": [
-    "db",
-    "db_003",
-    [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "DFParaWrite_Per_Sec",
-      "Physical_Read_Per_Sec",
-      "User_Commit",
-      "Redo_Per_Sec",
-      "container_cpu_used",
-      "CPU_free_pct",
-      "CPU_Used_Pct"
-    ]
-  ],
-  "132": [
-    "docker",
-    "docker_007",
-    [
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_thread_running",
-      "container_thread_used_pct",
-      "container_fgc",
-      "container_fgct",
-      "container_session_used",
-      "container_thread_total",
-      "container_mem_used",
-      "container_thread_idle"
-    ]
-  ],
-  "133": [
-    "db",
-    "db_003",
-    [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "Sess_Connect",
-      "Sess_Active",
-      "container_cpu_used",
-      "CPU_free_pct",
-      "Session_pct",
-      "Physical_Read_Per_Sec",
-      "Login_Per_Sec"
-    ]
-  ],
-  "134": [
-    "db",
-    "db_003",
-    [
-      "Sess_Connect",
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "ACS",
-      "MEM_real_util",
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "SeqRead_Per_Sec",
-      "DFParaWrite_Per_Sec"
-    ]
-  ],
-  "136": [
-    "db",
-    "db_003",
-    [
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "Sess_Connect",
-      "Login_Per_Sec",
-      "LFSync_Per_Sec",
-      "DFParaWrite_Per_Sec",
-      "ACS",
-      "DbTime",
-      "CPU_free_pct",
-      "CPU_Used_Pct"
-    ]
-  ],
-  "137": [
-    "db",
-    "db_007",
-    [
-      "MEM_real_util",
-      "LFSync_Per_Sec",
-      "LFParaWrite_Per_Sec",
-      "On_Off_State",
-      "MEM_Total",
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "tnsping_result_time",
-      "CPU_free_pct",
-      "CPU_Used_Pct"
-    ]
-  ],
-  "138": [
-    "db",
-    "db_007",
-    [
-      "Login_Per_Sec",
-      "MEM_real_util",
-      "Proc_Used_Pct",
-      "Sess_Connect",
-      "Proc_User_Used_Pct",
-      "LFSync_Per_Sec",
-      "Session_pct",
-      "LFParaWrite_Per_Sec",
-      "DFParaWrite_Per_Sec",
-      "Logic_Read_Per_Sec"
-    ]
-  ],
-  "139": [
-    "docker",
-    "docker_001",
-    [
-      "container_cpu_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_fgct",
-      "container_session_used",
-      "container_mem_used",
-      "container_thread_running",
-      "container_fgc",
-      "container_thread_used_pct"
-    ]
-  ],
-  "140": [
-    "docker",
-    "docker_003",
-    [
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc",
-      "container_thread_total"
-    ]
-  ],
-  "141": [
-    "docker",
-    "docker_001",
-    [
-      "container_cpu_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_fgct",
-      "container_session_used",
-      "container_mem_used",
-      "container_thread_running",
-      "container_fgc",
-      "container_thread_used_pct"
-    ]
-  ],
-  "142": [
-    "docker",
-    "docker_004",
-    [
-      "container_mem_used",
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc"
-    ]
-  ],
-  "143": [
-    "docker",
-    "docker_008",
-    [
-      "container_cpu_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_idle",
-      "container_thread_used_pct",
-      "container_session_used",
-      "container_fgc",
-      "container_thread_running",
-      "container_cpu_used",
-      "container_mem_used"
-    ]
-  ],
-  "144": [
-    "docker",
-    "docker_001",
-    [
-      "container_cpu_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_fgct",
-      "container_session_used",
-      "container_mem_used",
-      "container_thread_running",
-      "container_fgc",
-      "container_thread_used_pct"
-    ]
-  ],
-  "145": [
-    "docker",
-    "docker_001",
-    [
-      null
-    ]
-  ],
-  "146": [
-    "db",
-    "db_003",
-    [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "container_cpu_used",
-      "container_cpu_used",
-      "SeqRead_Per_Sec",
-      "AWS",
-      "container_thread_running",
-      "container_thread_used_pct",
-      "container_fgc"
-    ]
-  ],
-  "147": [
-    "docker",
-    "docker_008",
-    [
-      null
-    ]
-  ],
-  "148": [
-    "docker",
-    "docker_002",
-    [
-      "container_mem_used",
-      "Sess_Connect",
-      "Login_Per_Sec",
-      "MEM_real_util",
-      "SeqRead_Per_Sec",
-      "LFSync_Per_Sec",
-      "DFParaWrite_Per_Sec",
-      "MEM_Used",
-      "container_cpu_used",
-      "container_cpu_used"
-    ]
-  ],
-  "149": [
-    "docker",
-    "docker_008",
-    [
-      "container_mem_used",
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_thread_running",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_fgc",
-      "container_fgct",
-      "container_session_used"
-    ]
-  ],
-  "150": [
-    "docker",
-    "docker_008",
-    [
-      "container_mem_used",
-      "container_cpu_used",
-      "container_thread_running",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_fgc",
-      "container_fgct",
-      "container_session_used",
-      "container_thread_total",
-      "container_mem_used"
-    ]
-  ],
-  "151": [
-    "docker",
-    "docker_004",
-    [
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_thread_running",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_fgc",
-      "container_fgct",
-      "container_session_used",
-      "container_thread_total",
-      "container_mem_used"
-    ]
-  ],
-  "152": [
-    "docker",
-    "docker_004",
-    [
-      "container_mem_used",
-      "container_thread_total",
-      "container_fgct",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_mem_used",
-      "container_thread_running",
-      "container_thread_idle",
-      "container_session_used",
-      "container_fgc"
-    ]
-  ],
-  "153": [
-    "docker",
-    "docker_005",
-    [
-      null
-    ]
-  ],
-  "154": [
-    "docker",
-    "docker_001",
-    [
-      null
-    ]
-  ],
-  "156": [
-    "db",
-    "db_003",
-    [
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "Exec_Per_Sec",
-      "Proc_Used_Pct",
-      "Proc_User_Used_Pct",
-      "Redo_Per_Sec",
-      "CPU_Used_Pct",
-      "PGA_used_total",
-      "DFParaWrite_Per_Sec",
-      "AWS"
-    ]
-  ],
-  "157": [
-    "docker",
-    "docker_002",
-    [
-      "container_cpu_used",
-      "container_cpu_used",
-      "container_thread_running",
-      "container_thread_used_pct",
-      "container_fgc",
-      "container_fgct",
-      "container_session_used",
-      "container_thread_total",
-      "container_mem_used",
-      "container_thread_idle"
-    ]
-  ],
-  "158": [
-    "docker",
-    "docker_002",
-    [
-      "container_cpu_used",
-      "container_cpu_used",
-      "LFSync_Per_Sec",
-      "container_cpu_used",
-      "Call_Per_Sec",
-      "TPS_Per_Sec",
-      "User_Commit",
-      "Redo_Per_Sec",
-      "container_thread_running",
-      "container_thread_used_pct"
-    ]
-  ],
-  "159": [
-    "docker",
-    "docker_002",
-    [
-      null
-    ]
-  ],
-  "160": [
-    "docker",
-    "docker_007",
-    [
-      null
-    ]
-  ],
-  "161": [
-    "docker",
-    "docker_001",
-    [
-      null
-    ]
-  ],
-  "162": [
-    "docker",
-    "docker_008",
-    [
-      null
-    ]
-  ],
-  "163": [
-    "docker",
-    "docker_008",
-    [
-      null
-    ]
-  ],
-  "164": [
-    "docker",
-    "docker_003",
-    "docker_004",
-    [
-      null
-    ]
-  ],
-  "165": [
-    "db",
-    "db_003",
-    [
-      "Proc_Used_Pct",
-      "Proc_User_Used_Pct",
-      "Exec_Per_Sec",
-      "TPS_Per_Sec",
-      "Call_Per_Sec",
-      "Session_pct",
-      "MEM_real_util",
-      "PGA_used_total",
-      "LFSync_Per_Sec",
-      "DFParaWrite_Per_Sec"
-    ]
-  ],
-  "166": [
-    "db",
-    "db_003",
-    [
-      "Proc_User_Used_Pct",
-      "MEM_real_util",
-      "MEM_Used",
-      "MEM_Used_Pct",
-      "Proc_Used_Pct",
-      "Sess_Connect",
-      "Login_Per_Sec",
-      "Session_pct",
-      "TPS_Per_Sec",
-      "Call_Per_Sec"
-    ]
-  ],
-  "167": [
-    "docker",
-    "docker_004",
-    [
-      "container_mem_used",
-      "container_cpu_used",
-      "container_fgc",
-      "container_session_used",
-      "container_thread_used_pct",
-      "container_cpu_used",
-      "container_mem_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_thread_running"
-    ]
-  ],
-  "168": [
-    "docker",
-    "docker_006",
-    [
-      "container_cpu_used",
-      "container_fgc",
-      "container_session_used",
-      "container_thread_used_pct",
-      "container_mem_used",
-      "container_thread_idle",
-      "container_thread_total",
-      "container_thread_running",
-      "container_fgct"
-    ]
-  ],
-  "169": [
-    "docker",
-    "docker_003",
-    [
-      null
     ]
   ]
 }

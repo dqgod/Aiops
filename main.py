@@ -124,7 +124,6 @@ def find_abnormal_span(trace):
     abnormal_cmdb_ids = []
     Break = True
     # isError代表上溯的节点是否有异常
-
     def traverse(root_id, abn_ids, isError=False):
         root = spans[root_id]
         # 如果上溯有异常或本身有异常
@@ -220,6 +219,9 @@ plat_paths = [os.path.join(data_path.get_data_path(day),"平台指标") for day 
 interval_times,is_net_error,fault_ids = get_abnormal_interval(days)
 # print(fault_ids)
 # %%
+days=['2020_05_22']
+# ,'2020_05_23','2020_05_24','2020_05_25','2020_05_26'
+#     ,'2020_05_27','2020_05_28','2020_05_29','2020_05_30','2020_05_31']
 # todo step2 获取所有trace
 traces = {}
 for day in days:
@@ -239,6 +241,7 @@ for i in range(len(interval_times)):
     abnormal_indicators = []
     # todo step3 找出这段时间内的trace
     abnormal_traces = find_abnormal_trace(execption_Interval, traces)
+    trace = []
     # 如果是网络故障
     # print(is_net_error[i])
     # if is_net_error[i]:

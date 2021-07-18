@@ -10,7 +10,6 @@ import data_path
 
 def getKpis(files=None, path=None,kpis = {}):
     """[获取KPI曲线数据,将所有指标数据读到内存]
-
     Args:
         files ([type], optional): [传入文件列表 如list(["dcos_docker.csv"])]. Defaults to None.\n
         path: 目录，files 是path目录下的具体文件
@@ -68,30 +67,33 @@ def show_a_kpi_Curve(values, title=None):
 # print("加载show_a_kpi_Curve方法完毕")
 
 # %%
-# filter_list筛选列表，满足列表中条件才会被展示，为 None时 展示全部
-
-
 def showKpiCurve(kpis, filter_list=None):
+    """[summary] 展示指标折线图
+    Args:
+        kpis ([dict]): [指标字典]
+        filter_list ([list]], optional): [筛选列表，满足列表中条件才会被展示，为 None时 展示全部].
+    """
     filter_list = [] if not filter_list else filter_list
     for key, val in kpis.items():
         temp = key.split(",")
-        title = "(%s, %s, %s)" % (temp[0], temp[1], temp[2])
-        if list(filter(lambda x: x not in title, filter_list)):
-            continue
-        show_a_kpi_Curve(val, title)
+        title = ("(%s, %s, %s)" % (temp[0], temp[1], temp[2])).lower()
+        match = list(filter(lambda x: x.lower() in title, filter_list))
+        if len(match) == len(filter_list):
+            show_a_kpi_Curve(val, title)
         # break
 
-
+# %%
 def main():
     path = os.path.join(data_path.get_data_path(), "平台指标")
     print(path)
     print("读取文件信息：")
     kpis = getKpis(["dcos_docker.csv"])
-    filter_list = ["docker_002", "cpu"]
+    filter_list = ["cpu"]
     print("画图中：")
     showKpiCurve(kpis, filter_list)
 
-# main()
-
-
 # %%
+if __name__ == "__main__":
+    main()
+
+

@@ -123,7 +123,7 @@ def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     # 选取特征，不使用标签(类型)
     X_cols = cols
     print(data.shape)
-    # 训练
+    # 训练， 根据列名训练
     ilf.fit(data[X_cols])
     shape = data.shape[0]
     batch = 10**6
@@ -145,7 +145,7 @@ def fault_time(file_day,bias=0,type = 0):
     file_day: 数据说明所在的目录
     """
     table = read_xlrd(os.path.join(
-        data_path.get_data_path(file_day), "数据说明", "0故障说明.xlsx"))
+        data_path.data_instruction_path, "0故障说明.xlsx"))
     table_head = table.row_values(0)
     time_index, duration_index,fault_id_index = 0, 0, 0
     for i in range(table.ncols):

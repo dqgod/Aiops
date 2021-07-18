@@ -61,9 +61,6 @@ def divide_file(path,save_path = None): # 返回文件存储路径
                     writer.writerow(row)
     return save_path
 
-def getKpi(timesta, comd_id=None):
-    pass
-
 
 if __name__ == '__main__':
     # order(path)
