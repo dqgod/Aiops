@@ -186,7 +186,7 @@ def to_standard_answer(result,fault_ids):
     return answer
 
 ## 得到异常时间段
-def get_abnormal_interval(days):
+def get_abnormal_interval(days, useGiven=True):
     business_paths = [os.path.join(data_path.get_data_path(day), "业务指标", "esb.csv") for day in days]
     # 获取业务指标数据，去掉表头,np.array
     data = None
@@ -195,14 +195,23 @@ def get_abnormal_interval(days):
     data = data.values
     # 根据时间序列排序
     data = data[np.argsort(data[:, 1])]
-    # todo step1 异常时间序列
-    # 异常数据
-    abnormal_data = anomaly_detection.find_abnormal_data(data)
-    # 异常时间序列
-    execption_times = abnormal_data[:, 1].astype(np.int64)
-    #! 异常时间区间
-    # interval_times = anomaly_detection.to_interval(execption_times)
-    interval_times,fault_ids = anomaly_detection.fault_time(bias=0*60*100,file_day=days[0],type=2)
+
+    ## !异常时间区间
+    interval_times, fault_ids = [], []
+    
+    # 根据给出的异常文档找出异常时间段
+    if useGiven:
+        interval_times,fault_ids = anomaly_detection.fault_time(bias=0*60*100,file_day=days[0],type=2)
+    else: ## 通过自己算法找出
+        # 异常数据
+        abnormal_data = anomaly_detection.find_abnormal_data(data)
+        # 异常时间序列
+        execption_times = abnormal_data[:, 1].astype(np.int64)
+        #! 异常时间区间
+        interval_times = anomaly_detection.to_interval(execption_times)
+        fault_ids = range(len(interval_times))
+   
+
     print(str(interval_times))
     #! 对应时间区间是否是网络故障
     is_net_error =[]# anomaly_detection.is_net_error_func(interval_times,abnormal_data)

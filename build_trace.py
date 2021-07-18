@@ -1,4 +1,3 @@
-#%%
 from readExcel import fill_all_indicators
 from sort_data import divide_file
 import csv
@@ -39,6 +38,12 @@ file_now = {}
 bias = 10*1000
 
 
+
+def main():
+    days = ["2020_04_22"]
+    start_build_trace(days)
+    show_a_trace(data_path.data_save_path(), "trace_data_" + days[0]+".json", 2)
+
 def start_build_trace(days=["2020_04_20"]):
     indicators = fill_all_indicators(data_path.data_instruction_path)
     time0 = time.time()
@@ -53,7 +58,7 @@ def start_build_trace(days=["2020_04_20"]):
 
     print("程序运行完毕！花费: "+str(time.time()-time0)+" 秒")
 
-def build_trace(days, res=[]):
+def build_trace(days, res={}):
     """[summary]
 
     Args:
@@ -80,7 +85,12 @@ def build_trace(days, res=[]):
                     continue
                 # 通过row 构造span
                 span = generate_span(row)
-                res.append(span)
+                # 将span放到相应的trace中
+                traceId, span_id = row[4], row[5]
+                if res.get(traceId) == None:
+                    res[traceId] = {}
+                trace = res[traceId]
+                trace[span_id] = span
                 # break
             time_spend = time.time()-time1
             merge_time.append(time_spend)
@@ -176,12 +186,10 @@ def generate_span(row):
     '''
     # todo 将一行数据 row 放到字典中
     span = {}
-    span["traceId"] = row[4]
+    span["parent"] = row[6] if row[6] != "None" else "root"
+    span["target"] = row[8].replace('"', "").rstrip()
     # span["source"]=#pid 的target
-    span["name"] = row[8].replace('"', "").rstrip()
-    span["id"] = row[5]
-    span["parentId"] = row[6] if row[6] != "None" else "root"
-    span["timestamp"] = int(row[1])
+    span["timestamp"] = row[1]
     span["success"] = row[3]
     span["duration"] = row[2]
     span['cmdb_id'] = row[7]
@@ -200,21 +208,20 @@ def saveJson(res, save_path, filename):
     res中每一条数据都是 traceId: {starttime:111111, spans:{}}
     '''
     def processJson(js):
-        return json.dumps(js,)
+        return json.dumps(js)
         # return str(js)
     print("保存路径: "+save_path)
     start_time = time.time()
     with open(save_path, 'w') as f:
-        f.write('[\n')
-        # res中每一条数据都是 一个span, json
-        for i in tqdm(range(len(res)), desc="保存数据中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
-            span = res[i]
-            f.write(processJson(span))
-            if(i == len(res) - 1):
-                f.write("\n")
-            else:
-                f.write(",\n")
-        f.write(']')
+        f.write('{\n')
+        # res中每一条数据都是 traceId: {starttime:111111, spans:{}}
+        for traceId, trace in tqdm(res.items(), desc="保存数据中", ncols=100, ascii=' #', bar_format='{l_bar}{bar}|'):
+            # ? 保存数据时同时 得到 KPIs
+            # traceId, {starttime:111111, spans:{}}
+            # traceId, trace = items.pop(0)
+            # generate_KPIs_for_trace(trace)
+            f.write('"'+traceId+'": '+processJson(trace)+"\n")
+        f.write('}')
     print("保存完毕!花费 "+str(time.time()-start_time)+"S")
 
 
@@ -258,22 +265,13 @@ def show_a_trace(path, fileName, show_n=1):
     f2 = open(os.path.join(path,"a_trace.json"), "w")
     with open(os.path.join(path, fileName), "r") as f:
         line = f.readline()
-        
         line = f.readline()
         while show_n > 0 and line:
-            line = line.lstrip().rstrip()
-            if line[-1] == ",":
-                line = line[:len(line)-1]
-            js = json.loads(line)
+            js = json.loads('{'+line+'}')
+
             f2.write(json.dumps(js, indent=4)+"\n")
             line = f.readline()
             show_n = show_n - 1
     f2.close
-
-def main():
-    days = ["2020_04_22"]
-    # start_build_trace(days)
-    show_a_trace(data_path.data_save_path(), "trace_data_" + days[0]+".json", 2)
-    
 if __name__ == "__main__":
     main()
