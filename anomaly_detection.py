@@ -127,6 +127,7 @@ def iforest(data, cols, n_estimators=100, n_jobs=-1, verbose=2):
     ilf.fit(data[X_cols])
     shape = data.shape[0]
     batch = 10**6
+    
     all_pred = []
     for i in range(shape//batch+1):
         start = i * batch
